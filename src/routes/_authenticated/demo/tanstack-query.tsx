@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const Route = createFileRoute("/_authenticated/demo/tanstack-query")({
 	component: TanStackQueryDemo,
@@ -19,27 +20,32 @@ function TanStackQueryDemo() {
 
 	return (
 		<div
-			className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-4 text-white"
+			className="flex items-center justify-center min-h-screen p-4"
 			style={{
 				backgroundImage:
 					"radial-gradient(50% 50% at 95% 5%, #f4a460 0%, #8b4513 70%, #1a0f0a 100%)",
 			}}
 		>
-			<div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
-				<h1 className="text-2xl mb-4">
-					TanStack Query Simple Promise Handling
-				</h1>
-				<ul className="mb-4 space-y-2">
-					{data.map((todo) => (
-						<li
-							key={todo.id}
-							className="bg-white/10 border border-white/20 rounded-lg p-3 backdrop-blur-sm shadow-md"
-						>
-							<span className="text-lg text-white">{todo.name}</span>
-						</li>
-					))}
-				</ul>
-			</div>
+			<Card className="w-full max-w-2xl bg-black/50 text-white border-white/10 backdrop-blur-md">
+				<CardHeader>
+					<CardTitle className="text-white text-2xl">
+						TanStack Query Simple Promise Handling
+					</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<ul className="space-y-2">
+						{data.map((todo) => (
+							<li key={todo.id}>
+								<Card className="bg-white/10 border-white/20 text-white">
+									<CardContent className="py-3">
+										<span className="text-lg">{todo.name}</span>
+									</CardContent>
+								</Card>
+							</li>
+						))}
+					</ul>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }

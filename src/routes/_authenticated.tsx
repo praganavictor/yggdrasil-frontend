@@ -9,9 +9,13 @@ export const Route = createFileRoute("/_authenticated")({
 		}
 	},
 	component: () => (
-		<>
-			<Header />
-			<Outlet />
-		</>
+		<div className="flex h-screen flex-col">
+			<div className="sticky top-0 z-50">
+				<Header />
+			</div>
+			<main className="flex-1 overflow-y-auto">
+				<Outlet />
+			</main>
+		</div>
 	),
 });
