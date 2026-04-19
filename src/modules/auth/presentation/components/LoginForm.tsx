@@ -2,20 +2,35 @@ import { Eye, EyeOff, Loader2, LogIn } from "lucide-react";
 import { type FormEvent, useId, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLogin } from "@/modules/auth/presentation/hooks/useLogin";
 
+const REMEMBERED_EMAIL_KEY = "remembered_email";
+
+function getSavedEmail(): string {
+	return localStorage.getItem(REMEMBERED_EMAIL_KEY) ?? "";
+}
+
 export function LoginForm() {
 	const { login, isPending, errorMessage } = useLogin();
-	const [email, setEmail] = useState("");
+	const savedEmail = getSavedEmail();
+	const [email, setEmail] = useState(savedEmail);
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
+	const [rememberMe, setRememberMe] = useState(savedEmail !== "");
 	const emailId = useId();
 	const passwordId = useId();
+	const rememberMeId = useId();
 
 	function handleSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
+		if (rememberMe) {
+			localStorage.setItem(REMEMBERED_EMAIL_KEY, email);
+		} else {
+			localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+		}
 		login({ email, password });
 	}
 
@@ -66,6 +81,18 @@ export function LoginForm() {
 						{showPassword ? <EyeOff /> : <Eye />}
 					</Button>
 				</div>
+			</div>
+
+			<div className="flex items-center gap-2">
+				<Checkbox
+					id={rememberMeId}
+					checked={rememberMe}
+					onCheckedChange={(checked) => setRememberMe(checked === true)}
+					disabled={isPending}
+				/>
+				<Label htmlFor={rememberMeId} className="cursor-pointer font-normal">
+					Lembrar meu e-mail
+				</Label>
 			</div>
 
 			<Button

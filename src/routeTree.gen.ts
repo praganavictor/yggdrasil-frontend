@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedStockMovimentIndexRouteImport } from './routes/_authenticated/stock-moviment/index'
+import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authenticated/products/index'
 import { Route as AuthenticatedDemoTanstackQueryRouteImport } from './routes/_authenticated/demo/tanstack-query'
 
 const LoginRoute = LoginRouteImport.update({
@@ -28,6 +30,18 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedStockMovimentIndexRoute =
+  AuthenticatedStockMovimentIndexRouteImport.update({
+    id: '/stock-moviment/',
+    path: '/stock-moviment/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedProductsIndexRoute =
+  AuthenticatedProductsIndexRouteImport.update({
+    id: '/products/',
+    path: '/products/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDemoTanstackQueryRoute =
   AuthenticatedDemoTanstackQueryRouteImport.update({
     id: '/demo/tanstack-query',
@@ -39,11 +53,15 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/': typeof AuthenticatedIndexRoute
   '/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
+  '/products': typeof AuthenticatedProductsIndexRoute
+  '/stock-moviment': typeof AuthenticatedStockMovimentIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof AuthenticatedIndexRoute
   '/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
+  '/products': typeof AuthenticatedProductsIndexRoute
+  '/stock-moviment': typeof AuthenticatedStockMovimentIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -51,18 +69,27 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
+  '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
+  '/_authenticated/stock-moviment/': typeof AuthenticatedStockMovimentIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/' | '/demo/tanstack-query'
+  fullPaths:
+    | '/login'
+    | '/'
+    | '/demo/tanstack-query'
+    | '/products'
+    | '/stock-moviment'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/demo/tanstack-query'
+  to: '/login' | '/' | '/demo/tanstack-query' | '/products' | '/stock-moviment'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/'
     | '/_authenticated/demo/tanstack-query'
+    | '/_authenticated/products/'
+    | '/_authenticated/stock-moviment/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,6 +120,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/stock-moviment/': {
+      id: '/_authenticated/stock-moviment/'
+      path: '/stock-moviment'
+      fullPath: '/stock-moviment'
+      preLoaderRoute: typeof AuthenticatedStockMovimentIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/products/': {
+      id: '/_authenticated/products/'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof AuthenticatedProductsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/demo/tanstack-query': {
       id: '/_authenticated/demo/tanstack-query'
       path: '/demo/tanstack-query'
@@ -106,11 +147,15 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedDemoTanstackQueryRoute: typeof AuthenticatedDemoTanstackQueryRoute
+  AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
+  AuthenticatedStockMovimentIndexRoute: typeof AuthenticatedStockMovimentIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedDemoTanstackQueryRoute: AuthenticatedDemoTanstackQueryRoute,
+  AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
+  AuthenticatedStockMovimentIndexRoute: AuthenticatedStockMovimentIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

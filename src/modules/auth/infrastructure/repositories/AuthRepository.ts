@@ -19,6 +19,8 @@ export class AuthRepository implements IAuthRepository {
 				credentials.password,
 			);
 
+			console.log("Login response:", response);
+
 			const user = createUser(response.user);
 			const token = createAuthToken(response);
 
@@ -28,15 +30,12 @@ export class AuthRepository implements IAuthRepository {
 			return { user, token };
 		} catch (error) {
 			if (error instanceof HttpError) {
-				if (error.status === 401) {
-					throw new AuthError(
-						"INVALID_CREDENTIALS",
-						"Invalid email or password",
-					);
-				}
-				if (error.status === 403) {
-					throw new AuthError("ACCOUNT_LOCKED", "Your account has been locked");
-				}
+				const body = error.body as Record<string, unknown> | null;
+				const message =
+					typeof body?.message === "string"
+						? body.message
+						: "An error occurred. Please try again.";
+				throw new AuthError("UNKNOWN", message);
 			}
 			if (error instanceof TypeError) {
 				throw new AuthError(
@@ -45,7 +44,7 @@ export class AuthRepository implements IAuthRepository {
 					error,
 				);
 			}
-			throw new AuthError("UNKNOWN", "Login failed", error);
+			throw new AuthError("UNKNOWN", "An error occurred. Please try again.", error);
 		}
 	}
 

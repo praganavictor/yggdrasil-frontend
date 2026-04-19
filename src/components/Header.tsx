@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Menu, Network } from "lucide-react";
+import { ArrowLeftRight, Home, Menu, Network, Package } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +42,30 @@ export default function Header() {
 						>
 							<Home size={18} />
 							Home
+						</Link>
+						<Link
+							to="/products"
+							onClick={() => setOpen(false)}
+							className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+							activeProps={{
+								className:
+									"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
+							}}
+						>
+							<Package size={18} />
+							Produtos
+						</Link>
+						<Link
+							to="/stock-moviment"
+							onClick={() => setOpen(false)}
+							className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+							activeProps={{
+								className:
+									"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
+							}}
+						>
+							<ArrowLeftRight size={18} />
+							Movimentações
 						</Link>
 						<Link
 							to="/demo/tanstack-query"
