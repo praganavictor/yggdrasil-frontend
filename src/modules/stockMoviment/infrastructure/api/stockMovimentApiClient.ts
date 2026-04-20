@@ -11,33 +11,38 @@ function authHeaders(): Record<string, string> {
 	return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+interface PaginatedResponse<T> {
+	data: T[];
+	meta: { total: number; page: number; limit: number; totalPages: number };
+}
+
 export const stockMovimentApiClient = {
 	findAll(): Promise<StockMoviment[]> {
-		return httpClient.get<StockMoviment[]>("/stock-moviment", {
-			headers: authHeaders(),
-		});
+		return httpClient
+			.get<PaginatedResponse<StockMoviment>>("/stock-movements", { headers: authHeaders()})
+			.then((res) => res.data);
 	},
 
 	findById(id: string): Promise<StockMoviment> {
-		return httpClient.get<StockMoviment>(`/stock-moviment/${id}`, {
+		return httpClient.get<StockMoviment>(`/stock-movements/${id}`, {
 			headers: authHeaders(),
 		});
 	},
 
 	create(dto: CreateStockMovimentDto): Promise<StockMoviment> {
-		return httpClient.post<StockMoviment>("/stock-moviment", dto, {
+		return httpClient.post<StockMoviment>("/stock-movements", dto, {
 			headers: authHeaders(),
 		});
 	},
 
 	update(id: string, dto: UpdateStockMovimentDto): Promise<StockMoviment> {
-		return httpClient.put<StockMoviment>(`/stock-moviment/${id}`, dto, {
+		return httpClient.put<StockMoviment>(`/stock-movements/${id}`, dto, {
 			headers: authHeaders(),
 		});
 	},
 
 	delete(id: string): Promise<void> {
-		return httpClient.delete<void>(`/stock-moviment/${id}`, {
+		return httpClient.delete<void>(`/stock-movements/${id}`, {
 			headers: authHeaders(),
 		});
 	},

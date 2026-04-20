@@ -50,10 +50,13 @@ export class AuthRepository implements IAuthRepository {
 
 	async logout(): Promise<void> {
 		const token = tokenStorage.getToken();
-		if (token) {
-			await authApiClient.logout(token);
+		try {
+			if (token) {
+				await authApiClient.logout(token);
+			}
+		} finally {
+			tokenStorage.removeToken();
 		}
-		tokenStorage.removeToken();
 	}
 
 	async getCurrentUser(): Promise<User | null> {

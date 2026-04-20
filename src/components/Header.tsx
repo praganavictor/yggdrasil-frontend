@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeftRight, Home, Menu, Network, Package } from "lucide-react";
+import { ArrowLeftRight, Home, LogOut, Menu, Network, Package } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,9 +9,11 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
+import { useLogout } from "@/modules/auth/presentation/hooks/useLogout";
 
 export default function Header() {
 	const [open, setOpen] = useState(false);
+	const { logout, isPending } = useLogout();
 
 	return (
 		<header className="flex items-center gap-3 border-b bg-gray-900 px-4 py-3 shadow-sm">
@@ -90,6 +92,19 @@ export default function Header() {
 					className="h-8"
 				/>
 			</Link>
+
+			<div className="ml-auto">
+				<Button
+					variant="ghost"
+					size="icon"
+					className="text-white hover:bg-gray-700 hover:text-white"
+					aria-label="Logout"
+					onClick={() => logout()}
+					disabled={isPending}
+				>
+					<LogOut />
+				</Button>
+			</div>
 		</header>
 	);
 }

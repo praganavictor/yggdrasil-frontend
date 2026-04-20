@@ -11,11 +11,16 @@ function authHeaders(): Record<string, string> {
 	return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+interface PaginatedResponse<T> {
+	data: T[];
+	meta: { total: number; page: number; limit: number; totalPages: number };
+}
+
 export const productApiClient = {
 	findAll(): Promise<Product[]> {
-		return httpClient.get<Product[]>("/products", {
-			headers: authHeaders(),
-		});
+		return httpClient
+			.get<PaginatedResponse<Product>>("/products", { headers: authHeaders() })
+			.then((res) => res.data);
 	},
 
 	findById(id: string): Promise<Product> {
