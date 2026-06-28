@@ -5,7 +5,7 @@ import { tokenStorage } from "@/modules/auth/infrastructure/storage/tokenStorage
 export const Route = createFileRoute("/_authenticated")({
 	beforeLoad: () => {
 		if (!tokenStorage.isAuthenticated()) {
-			throw redirect({ to: "/login" });
+			throw redirect({ to: "/entrar" });
 		}
 	},
 	component: () => (

@@ -9,16 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
+import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedStockMovimentIndexRouteImport } from './routes/_authenticated/stock-moviment/index'
-import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authenticated/products/index'
-import { Route as AuthenticatedDemoTanstackQueryRouteImport } from './routes/_authenticated/demo/tanstack-query'
+import { Route as AuthenticatedProdutosIndexRouteImport } from './routes/_authenticated/produtos/index'
+import { Route as AuthenticatedMovimentacoesIndexRouteImport } from './routes/_authenticated/movimentacoes/index'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const EntrarRoute = EntrarRouteImport.update({
+  id: '/entrar',
+  path: '/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -30,80 +29,65 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedStockMovimentIndexRoute =
-  AuthenticatedStockMovimentIndexRouteImport.update({
-    id: '/stock-moviment/',
-    path: '/stock-moviment/',
+const AuthenticatedProdutosIndexRoute =
+  AuthenticatedProdutosIndexRouteImport.update({
+    id: '/produtos/',
+    path: '/produtos/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedProductsIndexRoute =
-  AuthenticatedProductsIndexRouteImport.update({
-    id: '/products/',
-    path: '/products/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDemoTanstackQueryRoute =
-  AuthenticatedDemoTanstackQueryRouteImport.update({
-    id: '/demo/tanstack-query',
-    path: '/demo/tanstack-query',
+const AuthenticatedMovimentacoesIndexRoute =
+  AuthenticatedMovimentacoesIndexRouteImport.update({
+    id: '/movimentacoes/',
+    path: '/movimentacoes/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/login': typeof LoginRoute
+  '/entrar': typeof EntrarRoute
   '/': typeof AuthenticatedIndexRoute
-  '/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
-  '/products': typeof AuthenticatedProductsIndexRoute
-  '/stock-moviment': typeof AuthenticatedStockMovimentIndexRoute
+  '/movimentacoes': typeof AuthenticatedMovimentacoesIndexRoute
+  '/produtos': typeof AuthenticatedProdutosIndexRoute
 }
 export interface FileRoutesByTo {
-  '/login': typeof LoginRoute
+  '/entrar': typeof EntrarRoute
   '/': typeof AuthenticatedIndexRoute
-  '/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
-  '/products': typeof AuthenticatedProductsIndexRoute
-  '/stock-moviment': typeof AuthenticatedStockMovimentIndexRoute
+  '/movimentacoes': typeof AuthenticatedMovimentacoesIndexRoute
+  '/produtos': typeof AuthenticatedProdutosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/login': typeof LoginRoute
+  '/entrar': typeof EntrarRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
-  '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
-  '/_authenticated/stock-moviment/': typeof AuthenticatedStockMovimentIndexRoute
+  '/_authenticated/movimentacoes/': typeof AuthenticatedMovimentacoesIndexRoute
+  '/_authenticated/produtos/': typeof AuthenticatedProdutosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/login'
-    | '/'
-    | '/demo/tanstack-query'
-    | '/products'
-    | '/stock-moviment'
+  fullPaths: '/entrar' | '/' | '/movimentacoes' | '/produtos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/demo/tanstack-query' | '/products' | '/stock-moviment'
+  to: '/entrar' | '/' | '/movimentacoes' | '/produtos'
   id:
     | '__root__'
     | '/_authenticated'
-    | '/login'
+    | '/entrar'
     | '/_authenticated/'
-    | '/_authenticated/demo/tanstack-query'
-    | '/_authenticated/products/'
-    | '/_authenticated/stock-moviment/'
+    | '/_authenticated/movimentacoes/'
+    | '/_authenticated/produtos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  LoginRoute: typeof LoginRoute
+  EntrarRoute: typeof EntrarRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/entrar': {
+      id: '/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof EntrarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -120,25 +104,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/stock-moviment/': {
-      id: '/_authenticated/stock-moviment/'
-      path: '/stock-moviment'
-      fullPath: '/stock-moviment'
-      preLoaderRoute: typeof AuthenticatedStockMovimentIndexRouteImport
+    '/_authenticated/produtos/': {
+      id: '/_authenticated/produtos/'
+      path: '/produtos'
+      fullPath: '/produtos'
+      preLoaderRoute: typeof AuthenticatedProdutosIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/products/': {
-      id: '/_authenticated/products/'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof AuthenticatedProductsIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/demo/tanstack-query': {
-      id: '/_authenticated/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof AuthenticatedDemoTanstackQueryRouteImport
+    '/_authenticated/movimentacoes/': {
+      id: '/_authenticated/movimentacoes/'
+      path: '/movimentacoes'
+      fullPath: '/movimentacoes'
+      preLoaderRoute: typeof AuthenticatedMovimentacoesIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
@@ -146,16 +123,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedDemoTanstackQueryRoute: typeof AuthenticatedDemoTanstackQueryRoute
-  AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
-  AuthenticatedStockMovimentIndexRoute: typeof AuthenticatedStockMovimentIndexRoute
+  AuthenticatedMovimentacoesIndexRoute: typeof AuthenticatedMovimentacoesIndexRoute
+  AuthenticatedProdutosIndexRoute: typeof AuthenticatedProdutosIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedDemoTanstackQueryRoute: AuthenticatedDemoTanstackQueryRoute,
-  AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
-  AuthenticatedStockMovimentIndexRoute: AuthenticatedStockMovimentIndexRoute,
+  AuthenticatedMovimentacoesIndexRoute: AuthenticatedMovimentacoesIndexRoute,
+  AuthenticatedProdutosIndexRoute: AuthenticatedProdutosIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -164,7 +139,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  LoginRoute: LoginRoute,
+  EntrarRoute: EntrarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

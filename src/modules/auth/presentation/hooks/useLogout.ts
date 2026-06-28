@@ -12,7 +12,7 @@ export function useLogout() {
 	const mutation = useMutation({
 		mutationFn: () => logoutUseCase.execute(),
 		onSuccess: () => {
-			router.navigate({ to: "/login" });
+			router.navigate({ to: "/entrar" });
 		},
 	});
 

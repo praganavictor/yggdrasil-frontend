@@ -8,18 +8,22 @@ import { Label } from "@/components/ui/label";
 import { useLogin } from "@/modules/auth/presentation/hooks/useLogin";
 
 const REMEMBERED_EMAIL_KEY = "remembered_email";
+const REMEMBERED_PASSWORD_KEY = "remembered_password";
 
-function getSavedEmail(): string {
-	return localStorage.getItem(REMEMBERED_EMAIL_KEY) ?? "";
+function getSavedCredentials() {
+	return {
+		email: localStorage.getItem(REMEMBERED_EMAIL_KEY) ?? "",
+		password: localStorage.getItem(REMEMBERED_PASSWORD_KEY) ?? "",
+	};
 }
 
 export function LoginForm() {
 	const { login, isPending, errorMessage } = useLogin();
-	const savedEmail = getSavedEmail();
-	const [email, setEmail] = useState(savedEmail);
-	const [password, setPassword] = useState("");
+	const saved = getSavedCredentials();
+	const [email, setEmail] = useState(saved.email);
+	const [password, setPassword] = useState(saved.password);
 	const [showPassword, setShowPassword] = useState(false);
-	const [rememberMe, setRememberMe] = useState(savedEmail !== "");
+	const [rememberMe, setRememberMe] = useState(saved.email !== "");
 	const emailId = useId();
 	const passwordId = useId();
 	const rememberMeId = useId();
@@ -28,8 +32,10 @@ export function LoginForm() {
 		e.preventDefault();
 		if (rememberMe) {
 			localStorage.setItem(REMEMBERED_EMAIL_KEY, email);
+			localStorage.setItem(REMEMBERED_PASSWORD_KEY, password);
 		} else {
 			localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+			localStorage.removeItem(REMEMBERED_PASSWORD_KEY);
 		}
 		login({ email, password });
 	}
@@ -75,7 +81,7 @@ export function LoginForm() {
 						variant="ghost"
 						size="icon-sm"
 						onClick={() => setShowPassword((v) => !v)}
-						className="absolute top-1/2 right-1.5 -translate-y-1/2 text-muted-foreground"
+						className="absolute inset-y-0 right-1.5 my-auto text-muted-foreground"
 						aria-label={showPassword ? "Hide password" : "Show password"}
 					>
 						{showPassword ? <EyeOff /> : <Eye />}
@@ -91,7 +97,7 @@ export function LoginForm() {
 					disabled={isPending}
 				/>
 				<Label htmlFor={rememberMeId} className="cursor-pointer font-normal">
-					Lembrar meu e-mail
+					Lembrar de mim
 				</Label>
 			</div>
 

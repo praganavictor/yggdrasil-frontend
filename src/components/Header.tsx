@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeftRight, Home, LogOut, Menu, Network, Package } from "lucide-react";
+import { ArrowLeftRight, Home, LogOut, Menu, Package } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,7 @@ export default function Header() {
 				</SheetTrigger>
 				<SheetContent side="left" className="w-72">
 					<SheetHeader>
-						<SheetTitle>Navigation</SheetTitle>
+						<SheetTitle>Navegação</SheetTitle>
 					</SheetHeader>
 					<nav className="flex flex-col gap-1 px-2 py-4">
 						<Link
@@ -43,10 +43,10 @@ export default function Header() {
 							}}
 						>
 							<Home size={18} />
-							Home
+							Início
 						</Link>
 						<Link
-							to="/products"
+							to="/produtos"
 							onClick={() => setOpen(false)}
 							className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
 							activeProps={{
@@ -58,7 +58,7 @@ export default function Header() {
 							Produtos
 						</Link>
 						<Link
-							to="/stock-moviment"
+							to="/movimentacoes"
 							onClick={() => setOpen(false)}
 							className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
 							activeProps={{
@@ -68,18 +68,6 @@ export default function Header() {
 						>
 							<ArrowLeftRight size={18} />
 							Movimentações
-						</Link>
-						<Link
-							to="/demo/tanstack-query"
-							onClick={() => setOpen(false)}
-							className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-							activeProps={{
-								className:
-									"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
-							}}
-						>
-							<Network size={18} />
-							TanStack Query
 						</Link>
 					</nav>
 				</SheetContent>
