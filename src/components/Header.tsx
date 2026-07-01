@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeftRight, Home, LogOut, Menu, Package } from "lucide-react";
+import { ArrowLeftRight, Home, LogOut, Menu, Package, Settings } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -68,6 +68,20 @@ export default function Header() {
 						>
 							<ArrowLeftRight size={18} />
 							Movimentações
+						</Link>
+						<div className="my-2 border-t" />
+
+						<Link
+							to="/configuracoes"
+							onClick={() => setOpen(false)}
+							className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+							activeProps={{
+								className:
+									"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
+							}}
+						>
+							<Settings size={18} />
+							Configurações
 						</Link>
 					</nav>
 				</SheetContent>

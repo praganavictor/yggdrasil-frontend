@@ -1,26 +1,33 @@
 import type {
 	CreateProductDto,
+	ProductQueryParams,
 	UpdateProductDto,
 } from "@/modules/products/application/dtos/ProductDto";
 import type { Product } from "@/modules/products/domain/entities/Product";
 import { tokenStorage } from "@/modules/auth/infrastructure/storage/tokenStorage";
 import { httpClient } from "@/shared/http/httpClient";
+import type { PaginatedResult } from "@/shared/types/pagination";
 
 function authHeaders(): Record<string, string> {
 	const token = tokenStorage.getToken();
 	return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-interface PaginatedResponse<T> {
-	data: T[];
-	meta: { total: number; page: number; limit: number; totalPages: number };
-}
-
 export const productApiClient = {
-	findAll(): Promise<Product[]> {
-		return httpClient
-			.get<PaginatedResponse<Product>>("/products", { headers: authHeaders() })
-			.then((res) => res.data);
+	findAll(
+		teamId: string,
+		params?: ProductQueryParams,
+	): Promise<PaginatedResult<Product>> {
+		const query = new URLSearchParams();
+		if (params?.page) query.set("page", String(params.page));
+		if (params?.limit) query.set("limit", String(params.limit));
+		if (params?.category) query.set("category", params.category);
+		const queryString = query.toString();
+
+		return httpClient.get<PaginatedResult<Product>>(
+			`/teams/${teamId}/products${queryString ? `?${queryString}` : ""}`,
+			{ headers: authHeaders() },
+		);
 	},
 
 	findById(id: string): Promise<Product> {
@@ -29,8 +36,8 @@ export const productApiClient = {
 		});
 	},
 
-	create(dto: CreateProductDto): Promise<Product> {
-		return httpClient.post<Product>("/products", dto, {
+	create(teamId: string, dto: CreateProductDto): Promise<Product> {
+		return httpClient.post<Product>(`/teams/${teamId}/products`, dto, {
 			headers: authHeaders(),
 		});
 	},

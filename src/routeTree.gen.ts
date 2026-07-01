@@ -14,6 +14,8 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedProdutosIndexRouteImport } from './routes/_authenticated/produtos/index'
 import { Route as AuthenticatedMovimentacoesIndexRouteImport } from './routes/_authenticated/movimentacoes/index'
+import { Route as AuthenticatedEquipesIndexRouteImport } from './routes/_authenticated/equipes/index'
+import { Route as AuthenticatedConfiguracoesIndexRouteImport } from './routes/_authenticated/configuracoes/index'
 
 const EntrarRoute = EntrarRouteImport.update({
   id: '/entrar',
@@ -41,16 +43,32 @@ const AuthenticatedMovimentacoesIndexRoute =
     path: '/movimentacoes/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedEquipesIndexRoute =
+  AuthenticatedEquipesIndexRouteImport.update({
+    id: '/equipes/',
+    path: '/equipes/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedConfiguracoesIndexRoute =
+  AuthenticatedConfiguracoesIndexRouteImport.update({
+    id: '/configuracoes/',
+    path: '/configuracoes/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/entrar': typeof EntrarRoute
   '/': typeof AuthenticatedIndexRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesIndexRoute
+  '/equipes': typeof AuthenticatedEquipesIndexRoute
   '/movimentacoes': typeof AuthenticatedMovimentacoesIndexRoute
   '/produtos': typeof AuthenticatedProdutosIndexRoute
 }
 export interface FileRoutesByTo {
   '/entrar': typeof EntrarRoute
   '/': typeof AuthenticatedIndexRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesIndexRoute
+  '/equipes': typeof AuthenticatedEquipesIndexRoute
   '/movimentacoes': typeof AuthenticatedMovimentacoesIndexRoute
   '/produtos': typeof AuthenticatedProdutosIndexRoute
 }
@@ -59,19 +77,35 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/entrar': typeof EntrarRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/configuracoes/': typeof AuthenticatedConfiguracoesIndexRoute
+  '/_authenticated/equipes/': typeof AuthenticatedEquipesIndexRoute
   '/_authenticated/movimentacoes/': typeof AuthenticatedMovimentacoesIndexRoute
   '/_authenticated/produtos/': typeof AuthenticatedProdutosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/entrar' | '/' | '/movimentacoes' | '/produtos'
+  fullPaths:
+    | '/entrar'
+    | '/'
+    | '/configuracoes'
+    | '/equipes'
+    | '/movimentacoes'
+    | '/produtos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/entrar' | '/' | '/movimentacoes' | '/produtos'
+  to:
+    | '/entrar'
+    | '/'
+    | '/configuracoes'
+    | '/equipes'
+    | '/movimentacoes'
+    | '/produtos'
   id:
     | '__root__'
     | '/_authenticated'
     | '/entrar'
     | '/_authenticated/'
+    | '/_authenticated/configuracoes/'
+    | '/_authenticated/equipes/'
     | '/_authenticated/movimentacoes/'
     | '/_authenticated/produtos/'
   fileRoutesById: FileRoutesById
@@ -118,17 +152,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMovimentacoesIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/equipes/': {
+      id: '/_authenticated/equipes/'
+      path: '/equipes'
+      fullPath: '/equipes'
+      preLoaderRoute: typeof AuthenticatedEquipesIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/configuracoes/': {
+      id: '/_authenticated/configuracoes/'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedConfiguracoesIndexRoute: typeof AuthenticatedConfiguracoesIndexRoute
+  AuthenticatedEquipesIndexRoute: typeof AuthenticatedEquipesIndexRoute
   AuthenticatedMovimentacoesIndexRoute: typeof AuthenticatedMovimentacoesIndexRoute
   AuthenticatedProdutosIndexRoute: typeof AuthenticatedProdutosIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedConfiguracoesIndexRoute: AuthenticatedConfiguracoesIndexRoute,
+  AuthenticatedEquipesIndexRoute: AuthenticatedEquipesIndexRoute,
   AuthenticatedMovimentacoesIndexRoute: AuthenticatedMovimentacoesIndexRoute,
   AuthenticatedProdutosIndexRoute: AuthenticatedProdutosIndexRoute,
 }

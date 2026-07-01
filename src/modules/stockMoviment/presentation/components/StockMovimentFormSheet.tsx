@@ -26,6 +26,7 @@ interface StockMovimentFormSheetProps {
 	moviment?: StockMoviment;
 	onSubmit: (dto: CreateStockMovimentDto) => void;
 	isPending: boolean;
+	teamId: string;
 }
 
 function toDateInputValue(isoDate: string): string {
@@ -36,22 +37,26 @@ function toISODate(dateValue: string): string {
 	return dateValue ? new Date(dateValue).toISOString() : "";
 }
 
-const emptyForm: CreateStockMovimentDto = {
-	type: "entrada",
-	quantity: 0,
-	price: 0,
-	date: new Date().toISOString(),
-	productId: "",
-};
-
 export function StockMovimentFormSheet({
 	open,
 	onOpenChange,
 	moviment,
 	onSubmit,
 	isPending,
+	teamId,
 }: StockMovimentFormSheetProps) {
-	const { data: products = [] } = useProducts();
+	const { data: productsResult } = useProducts(teamId, { limit: 100 });
+	const products = productsResult?.data ?? [];
+
+	const emptyForm: CreateStockMovimentDto = {
+		type: "entrada",
+		quantity: 0,
+		price: 0,
+		date: new Date().toISOString(),
+		productId: "",
+		teamId,
+	};
+
 	const [form, setForm] = useState<CreateStockMovimentDto>(emptyForm);
 
 	useEffect(() => {
@@ -62,11 +67,12 @@ export function StockMovimentFormSheet({
 				price: moviment.price,
 				date: moviment.date,
 				productId: moviment.productId,
+				teamId,
 			});
 		} else {
-			setForm(emptyForm);
+			setForm({ ...emptyForm, teamId });
 		}
-	}, [moviment, open]);
+	}, [moviment, open, teamId]);
 
 	function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
@@ -112,7 +118,7 @@ export function StockMovimentFormSheet({
 							onValueChange={(value) =>
 								setForm((prev) => ({
 									...prev,
-									type: value as "entrada" | "saida",
+									type: value as "entrada" | "saída",
 								}))
 							}
 						>
@@ -121,7 +127,7 @@ export function StockMovimentFormSheet({
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="entrada">Entrada</SelectItem>
-								<SelectItem value="saida">Saída</SelectItem>
+								<SelectItem value="saída">Saída</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>

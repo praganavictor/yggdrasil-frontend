@@ -4,8 +4,16 @@ import {
 	PackageIcon,
 	TriangleAlertIcon,
 } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import {
 	Table,
 	TableBody,
@@ -17,6 +25,9 @@ import {
 import { useAuthState } from "@/modules/auth/presentation/hooks/useAuthState";
 import { useProducts } from "@/modules/products/presentation/hooks/useProducts";
 import { useStockMoviments } from "@/modules/stockMoviment/presentation/hooks/useStockMoviments";
+import { Link } from "@tanstack/react-router";
+import { useTeams } from "@/modules/teams/presentation/hooks/useTeams";
+import { defaultTeamStorage } from "@/shared/storage/defaultTeamStorage";
 
 const currency = new Intl.NumberFormat("pt-BR", {
 	style: "currency",
@@ -81,8 +92,21 @@ function TypeBadge({ type }: { type: string }) {
 
 export function DashboardPage() {
 	const { user } = useAuthState();
-	const { data: products = [] } = useProducts();
-	const { data: moviments = [] } = useStockMoviments();
+	const defaultTeamId = defaultTeamStorage.get();
+	const hasDefault = defaultTeamId !== null;
+
+	const { data: teams = [] } = useTeams();
+	const [manualTeamId, setManualTeamId] = useState<string | null>(null);
+
+	const selectedTeamId = hasDefault ? defaultTeamId : manualTeamId;
+	const activeTeamName = teams.find((t) => t.id === selectedTeamId)?.name;
+
+	const { data: productsResult } = useProducts(selectedTeamId, { limit: 1000 });
+	const { data: movimentsResult } = useStockMoviments(selectedTeamId, {
+		limit: 1000,
+	});
+	const products = productsResult?.data ?? [];
+	const moviments = movimentsResult?.data ?? [];
 
 	const lowStock = products.filter(
 		(p) => p.quantity > 0 && p.quantity <= p.minumum,
@@ -90,7 +114,7 @@ export function DashboardPage() {
 	const outOfStock = products.filter((p) => p.quantity === 0);
 
 	const entradas = moviments.filter((m) => m.type === "entrada");
-	const saidas = moviments.filter((m) => m.type === "saida");
+	const saidas = moviments.filter((m) => m.type === "saída");
 	const totalEntradas = entradas.reduce(
 		(acc, m) => acc + m.quantity * m.price,
 		0,
@@ -105,13 +129,45 @@ export function DashboardPage() {
 
 	return (
 		<div className="p-6 flex flex-col gap-6">
-			<div>
-				<h1 className="text-2xl font-semibold text-foreground">
-					Olá, {firstName}
-				</h1>
-				<p className="text-sm text-muted-foreground mt-0.5">
-					Aqui está um resumo do seu estoque
-				</p>
+			<div className="flex items-center justify-between flex-wrap gap-3">
+				<div>
+					<h1 className="text-2xl font-semibold text-foreground">
+						Olá, {firstName}
+					</h1>
+					<p className="text-sm text-muted-foreground mt-0.5">
+						Aqui está um resumo do seu estoque
+						{hasDefault && activeTeamName && (
+							<> — <span className="font-medium text-foreground">{activeTeamName}</span></>
+						)}
+					</p>
+				</div>
+
+				{!hasDefault && (
+					<div className="flex items-center gap-3">
+						<span className="text-sm font-medium text-foreground shrink-0">Equipe:</span>
+						<Select
+							value={manualTeamId ?? ""}
+							onValueChange={(v) => setManualTeamId(v || null)}
+						>
+							<SelectTrigger className="w-52">
+								<SelectValue placeholder="Selecione uma equipe" />
+							</SelectTrigger>
+							<SelectContent>
+								{teams.map((team) => (
+									<SelectItem key={team.id} value={team.id}>
+										{team.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						<Link
+							to="/configuracoes"
+							className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+						>
+							Definir equipe padrão
+						</Link>
+					</div>
+				)}
 			</div>
 
 			<div className="flex flex-col gap-2">

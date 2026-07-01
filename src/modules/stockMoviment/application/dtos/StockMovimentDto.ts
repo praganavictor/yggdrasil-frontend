@@ -6,6 +6,13 @@ export interface CreateStockMovimentDto {
 	price: number;
 	date: string;
 	productId: string;
+	teamId: string;
 }
 
-export type UpdateStockMovimentDto = Partial<CreateStockMovimentDto>;
+export type UpdateStockMovimentDto = Partial<Omit<CreateStockMovimentDto, "teamId">>;
+
+export interface StockMovimentQueryParams {
+	page?: number;
+	limit?: number;
+	productId?: string;
+}

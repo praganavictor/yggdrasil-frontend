@@ -11,9 +11,10 @@ export function useCreateProduct() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (dto: CreateProductDto) => createProductUseCase.execute(dto),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: productsQueryKey });
+		mutationFn: ({ teamId, dto }: { teamId: string; dto: CreateProductDto }) =>
+			createProductUseCase.execute(teamId, dto),
+		onSuccess: (_data, { teamId }) => {
+			queryClient.invalidateQueries({ queryKey: productsQueryKey(teamId) });
 		},
 	});
 }

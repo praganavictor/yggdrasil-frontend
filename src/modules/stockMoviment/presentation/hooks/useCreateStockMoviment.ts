@@ -15,8 +15,10 @@ export function useCreateStockMoviment() {
 	return useMutation({
 		mutationFn: (dto: CreateStockMovimentDto) =>
 			createStockMovimentUseCase.execute(dto),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: stockMovimentsQueryKey });
+		onSuccess: (_data, dto) => {
+			queryClient.invalidateQueries({
+				queryKey: stockMovimentsQueryKey(dto.teamId),
+			});
 		},
 	});
 }

@@ -5,7 +5,7 @@ import type { IProductRepository } from "@/modules/products/domain/repositories/
 export class CreateProductUseCase {
 	constructor(private readonly repository: IProductRepository) {}
 
-	execute(dto: CreateProductDto): Promise<Product> {
-		return this.repository.create(dto);
+	execute(teamId: string, dto: CreateProductDto): Promise<Product> {
+		return this.repository.create(teamId, dto);
 	}
 }

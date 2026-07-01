@@ -1,3 +1,4 @@
+import type { ChangePasswordDto } from "@/modules/auth/application/dtos/ChangePasswordDto";
 import { httpClient } from "@/shared/http/httpClient";
 
 interface ApiLoginResponse {
@@ -20,17 +21,20 @@ export const authApiClient = {
 	},
 
 	logout(token: string): Promise<void> {
-		return httpClient.delete<void>("/logout", {
+		return httpClient.post<void>("/logout", undefined, {
 			headers: { Authorization: `Bearer ${token}` },
 		});
 	},
 
 	me(token: string): Promise<{ id: string; email: string; name: string }> {
-		return httpClient.get<{ id: string; email: string; name: string }>(
-			"/auth/me",
-			{
-				headers: { Authorization: `Bearer ${token}` },
-			},
-		);
+		return httpClient.get<{ id: string; email: string; name: string }>("/me", {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+	},
+
+	changePassword(token: string, dto: ChangePasswordDto): Promise<void> {
+		return httpClient.patch<void>("/change-password", dto, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
 	},
 };

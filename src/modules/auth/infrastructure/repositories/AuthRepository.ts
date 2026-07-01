@@ -1,3 +1,4 @@
+import type { ChangePasswordDto } from "@/modules/auth/application/dtos/ChangePasswordDto";
 import { createAuthToken } from "@/modules/auth/domain/entities/AuthToken";
 import type { User } from "@/modules/auth/domain/entities/User";
 import { createUser } from "@/modules/auth/domain/entities/User";
@@ -67,5 +68,11 @@ export class AuthRepository implements IAuthRepository {
 		} catch {
 			return null;
 		}
+	}
+
+	async changePassword(dto: ChangePasswordDto): Promise<void> {
+		const token = tokenStorage.getToken();
+		if (!token) throw new AuthError("UNKNOWN", "Not authenticated");
+		await authApiClient.changePassword(token, dto);
 	}
 }

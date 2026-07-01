@@ -1,5 +1,7 @@
+import { Link } from "@tanstack/react-router";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +10,14 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import {
 	Table,
 	TableBody,
@@ -24,6 +34,8 @@ import { useCreateProduct } from "@/modules/products/presentation/hooks/useCreat
 import { useDeleteProduct } from "@/modules/products/presentation/hooks/useDeleteProduct";
 import { useProducts } from "@/modules/products/presentation/hooks/useProducts";
 import { useUpdateProduct } from "@/modules/products/presentation/hooks/useUpdateProduct";
+import { useTeams } from "@/modules/teams/presentation/hooks/useTeams";
+import { defaultTeamStorage } from "@/shared/storage/defaultTeamStorage";
 
 function formatCurrency(value: number) {
 	return new Intl.NumberFormat("pt-BR", {
@@ -33,17 +45,45 @@ function formatCurrency(value: number) {
 }
 
 function StockBadge({ quantity, minimum }: { quantity: number; minimum: number }) {
-	if (quantity === 0) {
-		return <Badge variant="destructive">Sem estoque</Badge>;
-	}
-	if (quantity <= minimum) {
-		return <Badge variant="warning">Estoque baixo</Badge>;
-	}
+	if (quantity === 0) return <Badge variant="destructive">Sem estoque</Badge>;
+	if (quantity <= minimum) return <Badge variant="warning">Estoque baixo</Badge>;
 	return <Badge variant="success">Em estoque</Badge>;
 }
 
 export function ProductsPage() {
-	const { data: products = [], isLoading, isError } = useProducts();
+	const defaultTeamId = defaultTeamStorage.get();
+	const hasDefault = defaultTeamId !== null;
+
+	const { data: teams = [] } = useTeams();
+	const [manualTeamId, setManualTeamId] = useState<string | null>(null);
+
+	const selectedTeamId = hasDefault ? defaultTeamId : manualTeamId;
+
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(10);
+	const [categoryInput, setCategoryInput] = useState("");
+	const [category, setCategory] = useState("");
+
+	useEffect(() => {
+		const timeout = setTimeout(() => setCategory(categoryInput.trim()), 400);
+		return () => clearTimeout(timeout);
+	}, [categoryInput]);
+
+	useEffect(() => {
+		setPage(1);
+	}, [selectedTeamId, category]);
+
+	const {
+		data: result,
+		isLoading,
+		isError,
+	} = useProducts(selectedTeamId, {
+		page,
+		limit,
+		category: category || undefined,
+	});
+	const products = result?.data ?? [];
+	const meta = result?.meta;
 	const createProduct = useCreateProduct();
 	const updateProduct = useUpdateProduct();
 	const deleteProduct = useDeleteProduct();
@@ -69,13 +109,17 @@ export function ProductsPage() {
 	}
 
 	function handleFormSubmit(dto: CreateProductDto) {
+		if (!selectedTeamId) return;
 		if (editingProduct) {
 			updateProduct.mutate(
 				{ id: editingProduct.id, dto },
 				{ onSuccess: () => setFormOpen(false) },
 			);
 		} else {
-			createProduct.mutate(dto, { onSuccess: () => setFormOpen(false) });
+			createProduct.mutate(
+				{ teamId: selectedTeamId, dto },
+				{ onSuccess: () => setFormOpen(false) },
+			);
 		}
 	}
 
@@ -100,30 +144,75 @@ export function ProductsPage() {
 						Gerencie o estoque de produtos
 					</p>
 				</div>
-				<Button onClick={handleNewProduct}>
+				<Button onClick={handleNewProduct} disabled={!selectedTeamId}>
 					<PlusIcon />
 					Novo produto
 				</Button>
 			</div>
+
+			{!hasDefault && (
+				<div className="flex items-center gap-3">
+					<span className="text-sm font-medium text-foreground shrink-0">Equipe:</span>
+					<Select
+						value={manualTeamId ?? ""}
+						onValueChange={(v) => setManualTeamId(v || null)}
+					>
+						<SelectTrigger className="w-64">
+							<SelectValue placeholder="Selecione uma equipe" />
+						</SelectTrigger>
+						<SelectContent>
+							{teams.map((team) => (
+								<SelectItem key={team.id} value={team.id}>
+									{team.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<Link
+						to="/configuracoes"
+						className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+					>
+						Definir equipe padrão
+					</Link>
+				</div>
+			)}
+
+			{selectedTeamId && (
+				<div className="flex items-center gap-3">
+					<span className="text-sm font-medium text-foreground shrink-0">Categoria:</span>
+					<Input
+						value={categoryInput}
+						onChange={(e) => setCategoryInput(e.target.value)}
+						placeholder="Filtrar por categoria"
+						className="w-64"
+					/>
+				</div>
+			)}
 
 			<Card>
 				<CardHeader className="border-b">
 					<CardTitle>Lista de produtos</CardTitle>
 				</CardHeader>
 				<CardContent className="p-0">
-					{isLoading && (
+					{!selectedTeamId && (
+						<div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
+							Selecione uma equipe para ver os produtos.
+						</div>
+					)}
+
+					{selectedTeamId && isLoading && (
 						<div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
 							Carregando produtos...
 						</div>
 					)}
 
-					{isError && (
+					{selectedTeamId && isError && (
 						<div className="flex items-center justify-center py-12 text-destructive text-sm">
 							Erro ao carregar produtos. Tente novamente.
 						</div>
 					)}
 
-					{!isLoading && !isError && products.length === 0 && (
+					{selectedTeamId && !isLoading && !isError && products.length === 0 && (
 						<div className="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground">
 							<p className="text-sm">Nenhum produto cadastrado.</p>
 							<Button variant="outline" size="sm" onClick={handleNewProduct}>
@@ -133,7 +222,7 @@ export function ProductsPage() {
 						</div>
 					)}
 
-					{!isLoading && !isError && products.length > 0 && (
+					{selectedTeamId && !isLoading && !isError && products.length > 0 && (
 						<Table>
 							<TableHeader>
 								<TableRow>
@@ -157,13 +246,9 @@ export function ProductsPage() {
 										</TableCell>
 										<TableCell>{product.category}</TableCell>
 										<TableCell>{product.subcategory}</TableCell>
-										<TableCell className="text-muted-foreground">
-											{product.local}
-										</TableCell>
+										<TableCell className="text-muted-foreground">{product.local}</TableCell>
 										<TableCell>{product.unity}</TableCell>
-										<TableCell className="text-right tabular-nums">
-											{product.quantity}
-										</TableCell>
+										<TableCell className="text-right tabular-nums">{product.quantity}</TableCell>
 										<TableCell className="text-right tabular-nums text-muted-foreground">
 											{product.minumum}
 										</TableCell>
@@ -171,10 +256,7 @@ export function ProductsPage() {
 											{formatCurrency(product.price)}
 										</TableCell>
 										<TableCell>
-											<StockBadge
-												quantity={product.quantity}
-												minimum={product.minumum}
-											/>
+											<StockBadge quantity={product.quantity} minimum={product.minumum} />
 										</TableCell>
 										<TableCell>
 											<div className="flex items-center gap-1">
@@ -203,6 +285,19 @@ export function ProductsPage() {
 						</Table>
 					)}
 				</CardContent>
+				{selectedTeamId && meta && (
+					<PaginationControls
+						page={meta.page}
+						totalPages={meta.totalPages}
+						total={meta.total}
+						limit={limit}
+						onPageChange={setPage}
+						onLimitChange={(newLimit) => {
+							setLimit(newLimit);
+							setPage(1);
+						}}
+					/>
+				)}
 			</Card>
 
 			<ProductFormSheet

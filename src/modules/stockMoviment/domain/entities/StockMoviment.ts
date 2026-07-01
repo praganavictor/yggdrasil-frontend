@@ -1,4 +1,4 @@
-export type StockMovimentType = "entrada" | "saida";
+export type StockMovimentType = "entrada" | "saída";
 
 export interface StockMoviment {
 	id: string;

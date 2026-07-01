@@ -11,3 +11,9 @@ export interface CreateProductDto {
 }
 
 export type UpdateProductDto = Partial<CreateProductDto>;
+
+export interface ProductQueryParams {
+	page?: number;
+	limit?: number;
+	category?: string;
+}
