@@ -43,7 +43,11 @@ export function DeleteTeamDialog({
 					>
 						Cancelar
 					</Button>
-					<Button variant="destructive" onClick={onConfirm} disabled={isPending}>
+					<Button
+						variant="destructive"
+						onClick={onConfirm}
+						disabled={isPending}
+					>
 						{isPending ? "Excluindo..." : "Excluir"}
 					</Button>
 				</DialogFooter>

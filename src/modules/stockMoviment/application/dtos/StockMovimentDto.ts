@@ -9,7 +9,9 @@ export interface CreateStockMovimentDto {
 	teamId: string;
 }
 
-export type UpdateStockMovimentDto = Partial<Omit<CreateStockMovimentDto, "teamId">>;
+export type UpdateStockMovimentDto = Partial<
+	Omit<CreateStockMovimentDto, "teamId">
+>;
 
 export interface StockMovimentQueryParams {
 	page?: number;

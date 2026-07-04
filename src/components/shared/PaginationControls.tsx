@@ -32,8 +32,8 @@ export function PaginationControls({
 	const end = Math.min(page * limit, total);
 
 	return (
-		<div className="flex items-center justify-between gap-4 px-4 py-3 border-t">
-			<div className="flex items-center gap-2 text-sm text-muted-foreground">
+		<div className="flex flex-col gap-3 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+			<div className="flex items-center justify-between gap-2 text-sm text-muted-foreground sm:justify-start">
 				<span>Itens por página:</span>
 				<Select
 					value={String(limit)}
@@ -52,7 +52,7 @@ export function PaginationControls({
 				</Select>
 			</div>
 
-			<div className="flex items-center gap-4">
+			<div className="flex items-center justify-between gap-4 sm:justify-end">
 				<span className="text-sm text-muted-foreground">
 					{total === 0 ? "0 resultados" : `${start}–${end} de ${total}`}
 				</span>
@@ -60,6 +60,7 @@ export function PaginationControls({
 					<Button
 						variant="outline"
 						size="icon-sm"
+						className="size-9 sm:size-7"
 						onClick={() => onPageChange(page - 1)}
 						disabled={page <= 1}
 						aria-label="Página anterior"
@@ -72,6 +73,7 @@ export function PaginationControls({
 					<Button
 						variant="outline"
 						size="icon-sm"
+						className="size-9 sm:size-7"
 						onClick={() => onPageChange(page + 1)}
 						disabled={page >= safeTotalPages}
 						aria-label="Próxima página"

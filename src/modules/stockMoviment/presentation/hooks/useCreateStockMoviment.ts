@@ -19,6 +19,9 @@ export function useCreateStockMoviment() {
 			queryClient.invalidateQueries({
 				queryKey: stockMovimentsQueryKey(dto.teamId),
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["products", dto.teamId],
+			});
 		},
 	});
 }

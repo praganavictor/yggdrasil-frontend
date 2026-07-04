@@ -1,4 +1,7 @@
-import type { Team, TeamMembership } from "@/modules/teams/domain/entities/Team";
+import type {
+	Team,
+	TeamMembership,
+} from "@/modules/teams/domain/entities/Team";
 import type {
 	AddTeamMemberDto,
 	CreateTeamDto,

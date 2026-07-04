@@ -11,10 +11,7 @@ export function useUpdateStockMoviment() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({
-			id,
-			dto,
-		}: { id: string; dto: UpdateStockMovimentDto }) =>
+		mutationFn: ({ id, dto }: { id: string; dto: UpdateStockMovimentDto }) =>
 			updateStockMovimentUseCase.execute(id, dto),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["stock-moviments"] });

@@ -61,7 +61,9 @@ export function TeamFormSheet({
 						<Input
 							id="team-name"
 							value={form.name}
-							onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+							onChange={(e) =>
+								setForm((prev) => ({ ...prev, name: e.target.value }))
+							}
 							placeholder="Nome da equipe"
 							required
 						/>

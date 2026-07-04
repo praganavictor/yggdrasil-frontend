@@ -26,7 +26,11 @@ import {
 	SheetTitle,
 } from "@/components/ui/sheet";
 import type { AddTeamMemberDto } from "@/modules/teams/application/dtos/TeamDto";
-import type { Team, TeamMemberRole, TeamMembership } from "@/modules/teams/domain/entities/Team";
+import type {
+	Team,
+	TeamMemberRole,
+	TeamMembership,
+} from "@/modules/teams/domain/entities/Team";
 import { useAddTeamMember } from "@/modules/teams/presentation/hooks/useAddTeamMember";
 import { useRemoveTeamMember } from "@/modules/teams/presentation/hooks/useRemoveTeamMember";
 import { useTeamMembers } from "@/modules/teams/presentation/hooks/useTeamMembers";
@@ -37,11 +41,12 @@ const roleLabel: Record<TeamMemberRole, string> = {
 	ATTENDANT: "Atendente",
 };
 
-const roleVariant: Record<TeamMemberRole, "default" | "secondary" | "outline"> = {
-	ADMIN: "default",
-	SUPERVISOR: "secondary",
-	ATTENDANT: "outline",
-};
+const roleVariant: Record<TeamMemberRole, "default" | "secondary" | "outline"> =
+	{
+		ADMIN: "default",
+		SUPERVISOR: "secondary",
+		ATTENDANT: "outline",
+	};
 
 interface AddMemberFormProps {
 	teamId: string;
@@ -49,7 +54,10 @@ interface AddMemberFormProps {
 }
 
 function AddMemberForm({ teamId, onClose }: AddMemberFormProps) {
-	const [form, setForm] = useState<AddTeamMemberDto>({ email: "", role: "ATTENDANT" });
+	const [form, setForm] = useState<AddTeamMemberDto>({
+		email: "",
+		role: "ATTENDANT",
+	});
 	const addMember = useAddTeamMember(teamId);
 
 	function handleSubmit(e: React.FormEvent) {
@@ -73,7 +81,9 @@ function AddMemberForm({ teamId, onClose }: AddMemberFormProps) {
 							id="member-email"
 							type="email"
 							value={form.email}
-							onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+							onChange={(e) =>
+								setForm((prev) => ({ ...prev, email: e.target.value }))
+							}
 							placeholder="usuario@exemplo.com"
 							required
 						/>
@@ -140,7 +150,9 @@ function RemoveConfirmDialog({
 		<Dialog open onOpenChange={(open) => !open && onClose()}>
 			<DialogContent showCloseButton={false} className="max-w-sm">
 				<DialogHeader>
-					<DialogTitle>{isSelf ? "Sair da equipe" : "Remover membro"}</DialogTitle>
+					<DialogTitle>
+						{isSelf ? "Sair da equipe" : "Remover membro"}
+					</DialogTitle>
 					<DialogDescription>
 						{isSelf
 							? "Tem certeza que deseja sair desta equipe?"
@@ -199,9 +211,7 @@ export function TeamMembersSheet({
 			<Sheet open={open} onOpenChange={onOpenChange}>
 				<SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
 					<SheetHeader>
-						<SheetTitle>
-							{team?.name} — Membros
-						</SheetTitle>
+						<SheetTitle>{team?.name} — Membros</SheetTitle>
 					</SheetHeader>
 
 					<div className="flex-1 overflow-y-auto px-4 py-2 flex flex-col gap-2">
@@ -243,7 +253,7 @@ export function TeamMembersSheet({
 									<Badge variant={roleVariant[membership.role]}>
 										{roleLabel[membership.role]}
 									</Badge>
-									{(isOwner && !isSelf) ? (
+									{isOwner && !isSelf ? (
 										<Button
 											variant="ghost"
 											size="icon-sm"

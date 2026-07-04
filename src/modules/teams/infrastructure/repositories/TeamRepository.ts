@@ -1,5 +1,12 @@
-import type { AddTeamMemberDto, CreateTeamDto, UpdateTeamDto } from "@/modules/teams/application/dtos/TeamDto";
-import type { Team, TeamMembership } from "@/modules/teams/domain/entities/Team";
+import type {
+	AddTeamMemberDto,
+	CreateTeamDto,
+	UpdateTeamDto,
+} from "@/modules/teams/application/dtos/TeamDto";
+import type {
+	Team,
+	TeamMembership,
+} from "@/modules/teams/domain/entities/Team";
 import type { ITeamRepository } from "@/modules/teams/domain/repositories/ITeamRepository";
 import { teamApiClient } from "@/modules/teams/infrastructure/api/teamApiClient";
 

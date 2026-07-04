@@ -140,8 +140,8 @@ export function DashboardPage() {
 	const firstName = user?.name?.split(" ")[0] ?? "usuário";
 
 	return (
-		<div className="p-6 flex flex-col gap-6">
-			<div className="flex items-center justify-between flex-wrap gap-3">
+		<div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-6">
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div>
 					<h1 className="text-2xl font-semibold text-foreground">
 						Olá, {firstName}
@@ -160,7 +160,7 @@ export function DashboardPage() {
 					</p>
 				</div>
 
-				<div className="flex items-center gap-3">
+				<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
 					<span className="text-sm font-medium text-foreground shrink-0">
 						Equipe:
 					</span>
@@ -170,7 +170,7 @@ export function DashboardPage() {
 							if (v) setDefault(v);
 						}}
 					>
-						<SelectTrigger className="w-52">
+						<SelectTrigger className="w-full sm:w-52">
 							<SelectValue placeholder="Selecione uma equipe" />
 						</SelectTrigger>
 						<SelectContent>
@@ -188,7 +188,7 @@ export function DashboardPage() {
 				<h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
 					Produtos
 				</h2>
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
 					<StatCard
 						label="Total de produtos"
 						value={String(products.length)}
@@ -214,7 +214,7 @@ export function DashboardPage() {
 				<h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
 					Movimentações
 				</h2>
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
 					<StatCard
 						label="Total de movimentações"
 						value={String(moviments.length)}
@@ -239,38 +239,62 @@ export function DashboardPage() {
 						<CardTitle>Últimas movimentações</CardTitle>
 					</CardHeader>
 					<CardContent className="p-0">
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>Data</TableHead>
-									<TableHead>Tipo</TableHead>
-									<TableHead>Produto</TableHead>
-									<TableHead className="text-right">Qtd.</TableHead>
-									<TableHead className="text-right">Total</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{recentMoviments.map((moviment) => (
-									<TableRow key={moviment.id}>
-										<TableCell className="text-muted-foreground whitespace-nowrap">
+						<div className="flex flex-col divide-y md:hidden">
+							{recentMoviments.map((moviment) => (
+								<div key={moviment.id} className="flex flex-col gap-1.5 p-4">
+									<div className="flex items-center gap-2">
+										<TypeBadge type={moviment.type} />
+										<span className="text-xs text-muted-foreground">
 											{dateFormat.format(new Date(moviment.date))}
-										</TableCell>
-										<TableCell>
-											<TypeBadge type={moviment.type} />
-										</TableCell>
-										<TableCell className="font-medium">
-											{moviment.product?.name ?? moviment.productId}
-										</TableCell>
-										<TableCell className="text-right tabular-nums">
-											{moviment.quantity}
-										</TableCell>
-										<TableCell className="text-right tabular-nums font-medium">
+										</span>
+									</div>
+									<span className="truncate font-medium text-foreground">
+										{moviment.product?.name ?? moviment.productId}
+									</span>
+									<span className="text-sm tabular-nums text-muted-foreground">
+										{moviment.quantity} un ·{" "}
+										<span className="font-medium text-foreground">
 											{currency.format(moviment.quantity * moviment.price)}
-										</TableCell>
+										</span>
+									</span>
+								</div>
+							))}
+						</div>
+
+						<div className="hidden md:block">
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead>Data</TableHead>
+										<TableHead>Tipo</TableHead>
+										<TableHead>Produto</TableHead>
+										<TableHead className="text-right">Qtd.</TableHead>
+										<TableHead className="text-right">Total</TableHead>
 									</TableRow>
-								))}
-							</TableBody>
-						</Table>
+								</TableHeader>
+								<TableBody>
+									{recentMoviments.map((moviment) => (
+										<TableRow key={moviment.id}>
+											<TableCell className="text-muted-foreground whitespace-nowrap">
+												{dateFormat.format(new Date(moviment.date))}
+											</TableCell>
+											<TableCell>
+												<TypeBadge type={moviment.type} />
+											</TableCell>
+											<TableCell className="font-medium">
+												{moviment.product?.name ?? moviment.productId}
+											</TableCell>
+											<TableCell className="text-right tabular-nums">
+												{moviment.quantity}
+											</TableCell>
+											<TableCell className="text-right tabular-nums font-medium">
+												{currency.format(moviment.quantity * moviment.price)}
+											</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
+						</div>
 					</CardContent>
 				</Card>
 			)}

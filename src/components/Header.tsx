@@ -1,5 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeftRight, Home, LogOut, Menu, Package, Settings } from "lucide-react";
+import {
+	ArrowLeftRight,
+	Home,
+	LogOut,
+	Menu,
+	Package,
+	Settings,
+} from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,8 +29,8 @@ export default function Header() {
 					<Button
 						variant="ghost"
 						size="icon"
-						className="text-white hover:bg-gray-700 hover:text-white"
-						aria-label="Open menu"
+						className="size-9 text-white hover:bg-gray-700 hover:text-white"
+						aria-label="Abrir menu"
 					>
 						<Menu />
 					</Button>
@@ -36,10 +43,10 @@ export default function Header() {
 						<Link
 							to="/"
 							onClick={() => setOpen(false)}
-							className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+							className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
 							activeProps={{
 								className:
-									"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
+									"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
 							}}
 						>
 							<Home size={18} />
@@ -48,10 +55,10 @@ export default function Header() {
 						<Link
 							to="/produtos"
 							onClick={() => setOpen(false)}
-							className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+							className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
 							activeProps={{
 								className:
-									"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
+									"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
 							}}
 						>
 							<Package size={18} />
@@ -60,10 +67,10 @@ export default function Header() {
 						<Link
 							to="/movimentacoes"
 							onClick={() => setOpen(false)}
-							className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+							className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
 							activeProps={{
 								className:
-									"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
+									"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
 							}}
 						>
 							<ArrowLeftRight size={18} />
@@ -74,10 +81,10 @@ export default function Header() {
 						<Link
 							to="/configuracoes"
 							onClick={() => setOpen(false)}
-							className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+							className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
 							activeProps={{
 								className:
-									"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
+									"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
 							}}
 						>
 							<Settings size={18} />
@@ -99,8 +106,8 @@ export default function Header() {
 				<Button
 					variant="ghost"
 					size="icon"
-					className="text-white hover:bg-gray-700 hover:text-white"
-					aria-label="Logout"
+					className="size-9 text-white hover:bg-gray-700 hover:text-white"
+					aria-label="Sair"
 					onClick={() => logout()}
 					disabled={isPending}
 				>

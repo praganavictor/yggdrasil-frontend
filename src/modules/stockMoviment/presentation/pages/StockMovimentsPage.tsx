@@ -148,8 +148,8 @@ export function StockMovimentsPage() {
 	const isPendingForm = createMoviment.isPending || updateMoviment.isPending;
 
 	return (
-		<div className="p-6 flex flex-col gap-6">
-			<div className="flex items-center justify-between">
+		<div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-6">
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div>
 					<h1 className="text-2xl font-semibold text-foreground">
 						Movimentações de Estoque
@@ -158,14 +158,18 @@ export function StockMovimentsPage() {
 						Registre entradas e saídas de produtos
 					</p>
 				</div>
-				<Button onClick={handleNew} disabled={!selectedTeamId}>
+				<Button
+					onClick={handleNew}
+					disabled={!selectedTeamId}
+					className="w-full sm:w-auto"
+				>
 					<PlusIcon />
 					Nova movimentação
 				</Button>
 			</div>
 
 			{!hasDefault && (
-				<div className="flex items-center gap-3">
+				<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
 					<span className="text-sm font-medium text-foreground shrink-0">
 						Equipe:
 					</span>
@@ -173,7 +177,7 @@ export function StockMovimentsPage() {
 						value={manualTeamId ?? ""}
 						onValueChange={(v) => setManualTeamId(v || null)}
 					>
-						<SelectTrigger className="w-64">
+						<SelectTrigger className="w-full sm:w-64">
 							<SelectValue placeholder="Selecione uma equipe" />
 						</SelectTrigger>
 						<SelectContent>
@@ -194,7 +198,7 @@ export function StockMovimentsPage() {
 			)}
 
 			{selectedTeamId && (
-				<div className="flex items-center gap-3">
+				<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
 					<span className="text-sm font-medium text-foreground shrink-0">
 						Produto:
 					</span>
@@ -202,7 +206,7 @@ export function StockMovimentsPage() {
 						value={productFilter || "all"}
 						onValueChange={(v) => setProductFilter(v === "all" ? "" : v)}
 					>
-						<SelectTrigger className="w-64">
+						<SelectTrigger className="w-full sm:w-64">
 							<SelectValue placeholder="Todos os produtos" />
 						</SelectTrigger>
 						<SelectContent>
@@ -254,64 +258,112 @@ export function StockMovimentsPage() {
 						)}
 
 					{selectedTeamId && !isLoading && !isError && moviments.length > 0 && (
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>Data</TableHead>
-									<TableHead>Tipo</TableHead>
-									<TableHead>Produto</TableHead>
-									<TableHead className="text-right">Qtd.</TableHead>
-									<TableHead className="text-right">Preço unit.</TableHead>
-									<TableHead className="text-right">Total</TableHead>
-									<TableHead className="w-24">Ações</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{moviments.map((moviment) => (
-									<TableRow key={moviment.id}>
-										<TableCell className="text-muted-foreground whitespace-nowrap">
-											{dateFormat.format(new Date(moviment.date))}
-										</TableCell>
-										<TableCell>
+						<div className="flex flex-col divide-y md:hidden">
+							{moviments.map((moviment) => (
+								<div key={moviment.id} className="flex items-center gap-2 p-4">
+									<div className="flex min-w-0 flex-1 flex-col gap-1.5">
+										<div className="flex items-center gap-2">
 											<TypeBadge type={moviment.type} />
-										</TableCell>
-										<TableCell className="font-medium">
+											<span className="text-xs text-muted-foreground">
+												{dateFormat.format(new Date(moviment.date))}
+											</span>
+										</div>
+										<span className="truncate font-medium text-foreground">
 											{moviment.product?.name ?? moviment.productId}
-										</TableCell>
-										<TableCell className="text-right tabular-nums">
-											{moviment.quantity}
-										</TableCell>
-										<TableCell className="text-right tabular-nums">
-											{currency.format(moviment.price)}
-										</TableCell>
-										<TableCell className="text-right tabular-nums font-medium">
-											{currency.format(moviment.quantity * moviment.price)}
-										</TableCell>
-										<TableCell>
-											<div className="flex items-center gap-1">
-												<Button
-													variant="ghost"
-													size="icon-sm"
-													onClick={() => handleEdit(moviment)}
-													aria-label="Editar movimentação"
-												>
-													<PencilIcon />
-												</Button>
-												<Button
-													variant="ghost"
-													size="icon-sm"
-													className="text-destructive hover:text-destructive"
-													onClick={() => handleDelete(moviment)}
-													aria-label="Excluir movimentação"
-												>
-													<TrashIcon />
-												</Button>
-											</div>
-										</TableCell>
+										</span>
+										<span className="text-sm tabular-nums text-muted-foreground">
+											{moviment.quantity} × {currency.format(moviment.price)} ={" "}
+											<span className="font-medium text-foreground">
+												{currency.format(moviment.quantity * moviment.price)}
+											</span>
+										</span>
+									</div>
+									<div className="flex shrink-0 flex-col items-center gap-1">
+										<Button
+											variant="ghost"
+											size="icon"
+											className="size-9"
+											onClick={() => handleEdit(moviment)}
+											aria-label="Editar movimentação"
+										>
+											<PencilIcon />
+										</Button>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="size-9 text-destructive hover:text-destructive"
+											onClick={() => handleDelete(moviment)}
+											aria-label="Excluir movimentação"
+										>
+											<TrashIcon />
+										</Button>
+									</div>
+								</div>
+							))}
+						</div>
+					)}
+
+					{selectedTeamId && !isLoading && !isError && moviments.length > 0 && (
+						<div className="hidden md:block">
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead>Data</TableHead>
+										<TableHead>Tipo</TableHead>
+										<TableHead>Produto</TableHead>
+										<TableHead className="text-right">Qtd.</TableHead>
+										<TableHead className="text-right">Preço unit.</TableHead>
+										<TableHead className="text-right">Total</TableHead>
+										<TableHead className="w-24">Ações</TableHead>
 									</TableRow>
-								))}
-							</TableBody>
-						</Table>
+								</TableHeader>
+								<TableBody>
+									{moviments.map((moviment) => (
+										<TableRow key={moviment.id}>
+											<TableCell className="text-muted-foreground whitespace-nowrap">
+												{dateFormat.format(new Date(moviment.date))}
+											</TableCell>
+											<TableCell>
+												<TypeBadge type={moviment.type} />
+											</TableCell>
+											<TableCell className="font-medium">
+												{moviment.product?.name ?? moviment.productId}
+											</TableCell>
+											<TableCell className="text-right tabular-nums">
+												{moviment.quantity}
+											</TableCell>
+											<TableCell className="text-right tabular-nums">
+												{currency.format(moviment.price)}
+											</TableCell>
+											<TableCell className="text-right tabular-nums font-medium">
+												{currency.format(moviment.quantity * moviment.price)}
+											</TableCell>
+											<TableCell>
+												<div className="flex items-center gap-1">
+													<Button
+														variant="ghost"
+														size="icon-sm"
+														onClick={() => handleEdit(moviment)}
+														aria-label="Editar movimentação"
+													>
+														<PencilIcon />
+													</Button>
+													<Button
+														variant="ghost"
+														size="icon-sm"
+														className="text-destructive hover:text-destructive"
+														onClick={() => handleDelete(moviment)}
+														aria-label="Excluir movimentação"
+													>
+														<TrashIcon />
+													</Button>
+												</div>
+											</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
+						</div>
 					)}
 				</CardContent>
 				{selectedTeamId && meta && (

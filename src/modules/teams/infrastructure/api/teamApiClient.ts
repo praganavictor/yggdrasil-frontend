@@ -1,5 +1,12 @@
-import type { AddTeamMemberDto, CreateTeamDto, UpdateTeamDto } from "@/modules/teams/application/dtos/TeamDto";
-import type { Team, TeamMembership } from "@/modules/teams/domain/entities/Team";
+import type {
+	AddTeamMemberDto,
+	CreateTeamDto,
+	UpdateTeamDto,
+} from "@/modules/teams/application/dtos/TeamDto";
+import type {
+	Team,
+	TeamMembership,
+} from "@/modules/teams/domain/entities/Team";
 import { tokenStorage } from "@/modules/auth/infrastructure/storage/tokenStorage";
 import { httpClient } from "@/shared/http/httpClient";
 
@@ -22,7 +29,9 @@ export const teamApiClient = {
 	},
 
 	updateTeam(id: string, dto: UpdateTeamDto): Promise<Team> {
-		return httpClient.put<Team>(`/teams/${id}`, dto, { headers: authHeaders() });
+		return httpClient.put<Team>(`/teams/${id}`, dto, {
+			headers: authHeaders(),
+		});
 	},
 
 	deleteTeam(id: string): Promise<void> {

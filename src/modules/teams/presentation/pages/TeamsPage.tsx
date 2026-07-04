@@ -1,12 +1,7 @@
 import { PencilIcon, PlusIcon, TrashIcon, UsersIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	Table,
 	TableBody,
@@ -15,9 +10,9 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { useAuthState } from "@/modules/auth/presentation/hooks/useAuthState";
 import type { CreateTeamDto } from "@/modules/teams/application/dtos/TeamDto";
 import type { Team } from "@/modules/teams/domain/entities/Team";
-import { useAuthState } from "@/modules/auth/presentation/hooks/useAuthState";
 import { DeleteTeamDialog } from "@/modules/teams/presentation/components/DeleteTeamDialog";
 import { TeamFormSheet } from "@/modules/teams/presentation/components/TeamFormSheet";
 import { TeamMembersSheet } from "@/modules/teams/presentation/components/TeamMembersSheet";
@@ -84,15 +79,15 @@ export function TeamsPage() {
 	const isPendingForm = createTeam.isPending || updateTeam.isPending;
 
 	return (
-		<div className="p-6 flex flex-col gap-6">
-			<div className="flex items-center justify-between">
+		<div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-6">
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div>
 					<h1 className="text-2xl font-semibold text-foreground">Equipes</h1>
 					<p className="text-sm text-muted-foreground mt-0.5">
 						Gerencie as equipes e seus membros
 					</p>
 				</div>
-				<Button onClick={handleNewTeam}>
+				<Button onClick={handleNewTeam} className="w-full sm:w-auto">
 					<PlusIcon />
 					Nova equipe
 				</Button>
@@ -126,61 +121,118 @@ export function TeamsPage() {
 					)}
 
 					{!isLoading && !isError && teams.length > 0 && (
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>Nome</TableHead>
-									<TableHead>Descrição</TableHead>
-									<TableHead className="w-32">Ações</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{teams.map((team) => {
-									const isOwner = team.ownerId === user?.id;
-									return (
-										<TableRow key={team.id}>
-											<TableCell className="font-medium">{team.name}</TableCell>
-											<TableCell className="text-muted-foreground max-w-xs truncate">
+						<div className="flex flex-col divide-y md:hidden">
+							{teams.map((team) => {
+								const isOwner = team.ownerId === user?.id;
+								return (
+									<div key={team.id} className="flex items-center gap-2 p-4">
+										<div className="flex min-w-0 flex-1 flex-col gap-1">
+											<span className="truncate font-medium text-foreground">
+												{team.name}
+											</span>
+											<span className="truncate text-sm text-muted-foreground">
 												{team.description ?? "—"}
-											</TableCell>
-											<TableCell>
-												<div className="flex items-center gap-1">
+											</span>
+										</div>
+										<div className="flex shrink-0 items-center gap-1">
+											<Button
+												variant="ghost"
+												size="icon"
+												className="size-9"
+												onClick={() => handleViewMembers(team)}
+												aria-label="Ver membros"
+											>
+												<UsersIcon />
+											</Button>
+											{isOwner && (
+												<>
 													<Button
 														variant="ghost"
-														size="icon-sm"
-														onClick={() => handleViewMembers(team)}
-														aria-label="Ver membros"
+														size="icon"
+														className="size-9"
+														onClick={() => handleEditTeam(team)}
+														aria-label="Editar equipe"
 													>
-														<UsersIcon />
+														<PencilIcon />
 													</Button>
-													{isOwner && (
-														<>
-															<Button
-																variant="ghost"
-																size="icon-sm"
-																onClick={() => handleEditTeam(team)}
-																aria-label="Editar equipe"
-															>
-																<PencilIcon />
-															</Button>
-															<Button
-																variant="ghost"
-																size="icon-sm"
-																className="text-destructive hover:text-destructive"
-																onClick={() => handleDeleteTeam(team)}
-																aria-label="Excluir equipe"
-															>
-																<TrashIcon />
-															</Button>
-														</>
-													)}
-												</div>
-											</TableCell>
-										</TableRow>
-									);
-								})}
-							</TableBody>
-						</Table>
+													<Button
+														variant="ghost"
+														size="icon"
+														className="size-9 text-destructive hover:text-destructive"
+														onClick={() => handleDeleteTeam(team)}
+														aria-label="Excluir equipe"
+													>
+														<TrashIcon />
+													</Button>
+												</>
+											)}
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					)}
+
+					{!isLoading && !isError && teams.length > 0 && (
+						<div className="hidden md:block">
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead>Nome</TableHead>
+										<TableHead>Descrição</TableHead>
+										<TableHead className="w-32">Ações</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{teams.map((team) => {
+										const isOwner = team.ownerId === user?.id;
+										return (
+											<TableRow key={team.id}>
+												<TableCell className="font-medium">
+													{team.name}
+												</TableCell>
+												<TableCell className="text-muted-foreground max-w-xs truncate">
+													{team.description ?? "—"}
+												</TableCell>
+												<TableCell>
+													<div className="flex items-center gap-1">
+														<Button
+															variant="ghost"
+															size="icon-sm"
+															onClick={() => handleViewMembers(team)}
+															aria-label="Ver membros"
+														>
+															<UsersIcon />
+														</Button>
+														{isOwner && (
+															<>
+																<Button
+																	variant="ghost"
+																	size="icon-sm"
+																	onClick={() => handleEditTeam(team)}
+																	aria-label="Editar equipe"
+																>
+																	<PencilIcon />
+																</Button>
+																<Button
+																	variant="ghost"
+																	size="icon-sm"
+																	className="text-destructive hover:text-destructive"
+																	onClick={() => handleDeleteTeam(team)}
+																	aria-label="Excluir equipe"
+																>
+																	<TrashIcon />
+																</Button>
+															</>
+														)}
+													</div>
+												</TableCell>
+											</TableRow>
+										);
+									})}
+								</TableBody>
+							</Table>
+						</div>
 					)}
 				</CardContent>
 			</Card>

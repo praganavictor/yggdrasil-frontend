@@ -62,13 +62,21 @@ function ProfileTab() {
 			},
 			{
 				onSuccess: () => {
-					setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
-					setFeedback({ type: "success", message: "Senha alterada com sucesso." });
+					setForm({
+						currentPassword: "",
+						newPassword: "",
+						confirmPassword: "",
+					});
+					setFeedback({
+						type: "success",
+						message: "Senha alterada com sucesso.",
+					});
 				},
 				onError: () => {
 					setFeedback({
 						type: "error",
-						message: "Senha atual incorreta ou erro ao alterar. Tente novamente.",
+						message:
+							"Senha atual incorreta ou erro ao alterar. Tente novamente.",
 					});
 				},
 			},
@@ -157,7 +165,7 @@ function ProfileTab() {
 						<Button
 							type="submit"
 							disabled={changePassword.isPending}
-							className="self-start"
+							className="w-full sm:w-auto sm:self-start"
 						>
 							{changePassword.isPending ? "Salvando..." : "Salvar senha"}
 						</Button>
@@ -176,7 +184,7 @@ function EquipesTab() {
 
 	return (
 		<div className="flex flex-col">
-			<div className="px-6 pt-6 pb-2">
+			<div className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
 				<Card className="max-w-lg">
 					<CardHeader>
 						<CardTitle>Equipe padrão</CardTitle>
@@ -235,7 +243,7 @@ export function SettingsPage() {
 
 	return (
 		<div className="flex flex-col h-full">
-			<div className="border-b bg-background px-6 pt-6">
+			<div className="border-b bg-background px-4 pt-4 sm:px-6 sm:pt-6">
 				<h1 className="text-2xl font-semibold text-foreground mb-4">
 					Configurações
 				</h1>
@@ -264,7 +272,7 @@ export function SettingsPage() {
 
 			<div className="flex-1 overflow-y-auto">
 				{activeTab === "perfil" && (
-					<div className="p-6">
+					<div className="p-4 sm:p-6">
 						<ProfileTab />
 					</div>
 				)}
