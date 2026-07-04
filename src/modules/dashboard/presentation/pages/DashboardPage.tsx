@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
 	ArrowDownCircleIcon,
 	ArrowUpCircleIcon,
@@ -43,11 +44,13 @@ function StatCard({
 	value,
 	icon,
 	variant,
+	to,
 }: {
 	label: string;
 	value: string;
 	icon: React.ReactNode;
 	variant?: "default" | "warning" | "danger";
+	to?: string;
 }) {
 	const valueClass =
 		variant === "danger"
@@ -56,8 +59,11 @@ function StatCard({
 				? "text-amber-600 dark:text-amber-400"
 				: "text-foreground";
 
-	return (
-		<Card size="sm">
+	const card = (
+		<Card
+			size="sm"
+			className={to ? "transition-colors hover:bg-accent" : undefined}
+		>
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<span className="text-sm text-muted-foreground">{label}</span>
@@ -69,6 +75,16 @@ function StatCard({
 			</CardHeader>
 		</Card>
 	);
+
+	if (to) {
+		return (
+			<Link to={to} className="block">
+				{card}
+			</Link>
+		);
+	}
+
+	return card;
 }
 
 function TypeBadge({ type }: { type: string }) {
@@ -177,6 +193,7 @@ export function DashboardPage() {
 						label="Total de produtos"
 						value={String(products.length)}
 						icon={<PackageIcon className="size-4 text-muted-foreground" />}
+						to="/produtos"
 					/>
 					<StatCard
 						label="Estoque baixo"

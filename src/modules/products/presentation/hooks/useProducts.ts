@@ -9,7 +9,10 @@ const getProductsUseCase = new GetProductsUseCase(productRepository);
 export const productsQueryKey = (teamId: string, params?: ProductQueryParams) =>
 	["products", teamId, params ?? {}] as const;
 
-export function useProducts(teamId: string | null, params?: ProductQueryParams) {
+export function useProducts(
+	teamId: string | null,
+	params?: ProductQueryParams,
+) {
 	return useQuery({
 		queryKey: productsQueryKey(teamId ?? "", params),
 		queryFn: () => getProductsUseCase.execute(teamId!, params),

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -13,6 +14,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import {
 	Table,
 	TableBody,
@@ -65,6 +67,7 @@ export function ProductsPage() {
 	const [limit, setLimit] = useState(10);
 	const [categoryInput, setCategoryInput] = useState("");
 	const [category, setCategory] = useState("");
+	const [onlyPortioned, setOnlyPortioned] = useState(false);
 
 	useEffect(() => {
 		const timeout = setTimeout(() => setCategory(categoryInput.trim()), 400);
@@ -73,7 +76,7 @@ export function ProductsPage() {
 
 	useEffect(() => {
 		setPage(1);
-	}, [selectedTeamId, category]);
+	}, [selectedTeamId, category, onlyPortioned]);
 
 	const {
 		data: result,
@@ -83,6 +86,7 @@ export function ProductsPage() {
 		page,
 		limit,
 		category: category || undefined,
+		isPortioned: onlyPortioned ? true : undefined,
 	});
 	const products = result?.data ?? [];
 	const meta = result?.meta;
@@ -184,7 +188,7 @@ export function ProductsPage() {
 			)}
 
 			{selectedTeamId && (
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-3 flex-wrap">
 					<span className="text-sm font-medium text-foreground shrink-0">
 						Categoria:
 					</span>
@@ -194,6 +198,17 @@ export function ProductsPage() {
 						placeholder="Filtrar por categoria"
 						className="w-64"
 					/>
+
+					<div className="flex items-center gap-2">
+						<Switch
+							id="only-portioned"
+							checked={onlyPortioned}
+							onCheckedChange={setOnlyPortioned}
+						/>
+						<Label htmlFor="only-portioned" className="font-normal">
+							Somente porcionados
+						</Label>
+					</div>
 				</div>
 			)}
 
@@ -242,6 +257,7 @@ export function ProductsPage() {
 									<TableHead>Subcategoria</TableHead>
 									<TableHead>Local</TableHead>
 									<TableHead>Unidade</TableHead>
+									<TableHead>Porcionado</TableHead>
 									<TableHead className="text-right">Qtd.</TableHead>
 									<TableHead className="text-right">Mín.</TableHead>
 									<TableHead className="text-right">Preço</TableHead>
@@ -261,6 +277,13 @@ export function ProductsPage() {
 											{product.local}
 										</TableCell>
 										<TableCell>{product.unity}</TableCell>
+										<TableCell>
+											{product.isPortioned ? (
+												<Badge variant="secondary">Sim</Badge>
+											) : (
+												<span className="text-muted-foreground">Não</span>
+											)}
+										</TableCell>
 										<TableCell className="text-right tabular-nums">
 											{product.quantity}
 										</TableCell>

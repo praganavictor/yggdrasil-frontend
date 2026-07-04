@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -31,6 +32,7 @@ const emptyForm: CreateProductDto = {
 	quantity: 0,
 	minumum: 0,
 	price: 0,
+	isPortioned: false,
 };
 
 export function ProductFormSheet({
@@ -54,6 +56,7 @@ export function ProductFormSheet({
 				quantity: product.quantity,
 				minumum: product.minumum,
 				price: product.price,
+				isPortioned: product.isPortioned,
 			});
 		} else {
 			setForm(emptyForm);
@@ -62,7 +65,7 @@ export function ProductFormSheet({
 
 	function handleChange(
 		field: keyof CreateProductDto,
-		value: string | number,
+		value: string | number | boolean,
 	) {
 		setForm((prev) => ({ ...prev, [field]: value }));
 	}
@@ -144,6 +147,19 @@ export function ProductFormSheet({
 							onChange={(e) => handleChange("unity", e.target.value)}
 							placeholder="Ex: unidade, caixa, kg"
 						/>
+					</div>
+
+					<div className="flex items-center gap-2">
+						<Checkbox
+							id="isPortioned"
+							checked={form.isPortioned}
+							onCheckedChange={(checked) =>
+								handleChange("isPortioned", checked === true)
+							}
+						/>
+						<Label htmlFor="isPortioned" className="font-normal">
+							Produto porcionado
+						</Label>
 					</div>
 
 					<div className="grid grid-cols-2 gap-3">

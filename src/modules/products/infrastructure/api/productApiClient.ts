@@ -1,10 +1,10 @@
+import { tokenStorage } from "@/modules/auth/infrastructure/storage/tokenStorage";
 import type {
 	CreateProductDto,
 	ProductQueryParams,
 	UpdateProductDto,
 } from "@/modules/products/application/dtos/ProductDto";
 import type { Product } from "@/modules/products/domain/entities/Product";
-import { tokenStorage } from "@/modules/auth/infrastructure/storage/tokenStorage";
 import { httpClient } from "@/shared/http/httpClient";
 import type { PaginatedResult } from "@/shared/types/pagination";
 
@@ -22,6 +22,9 @@ export const productApiClient = {
 		if (params?.page) query.set("page", String(params.page));
 		if (params?.limit) query.set("limit", String(params.limit));
 		if (params?.category) query.set("category", params.category);
+		if (params?.isPortioned !== undefined) {
+			query.set("isPortioned", String(params.isPortioned));
+		}
 		const queryString = query.toString();
 
 		return httpClient.get<PaginatedResult<Product>>(

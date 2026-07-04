@@ -1,9 +1,9 @@
-import type { Product } from "@/modules/products/domain/entities/Product";
 import type {
 	CreateProductDto,
 	ProductQueryParams,
 	UpdateProductDto,
 } from "@/modules/products/application/dtos/ProductDto";
+import type { Product } from "@/modules/products/domain/entities/Product";
 import type { PaginatedResult } from "@/shared/types/pagination";
 
 export interface IProductRepository {

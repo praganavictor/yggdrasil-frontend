@@ -8,6 +8,7 @@ export interface CreateProductDto {
 	quantity: number;
 	minumum: number;
 	price: number;
+	isPortioned: boolean;
 }
 
 export type UpdateProductDto = Partial<CreateProductDto>;
@@ -16,4 +17,5 @@ export interface ProductQueryParams {
 	page?: number;
 	limit?: number;
 	category?: string;
+	isPortioned?: boolean;
 }

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DeleteProductUseCase } from "@/modules/products/application/useCases/DeleteProductUseCase";
 import { ProductRepository } from "@/modules/products/infrastructure/repositories/ProductRepository";
+
 const productRepository = new ProductRepository();
 const deleteProductUseCase = new DeleteProductUseCase(productRepository);
 

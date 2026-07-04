@@ -9,6 +9,7 @@ export interface Product {
 	quantity: number;
 	minumum: number;
 	price: number;
+	isPortioned: boolean;
 	createdAt?: string;
 	updatedAt?: string;
 }
