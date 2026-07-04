@@ -1,11 +1,9 @@
-import { Link } from "@tanstack/react-router";
 import {
 	ArrowDownCircleIcon,
 	ArrowUpCircleIcon,
 	PackageIcon,
 	TriangleAlertIcon,
 } from "lucide-react";
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -92,13 +90,11 @@ function TypeBadge({ type }: { type: string }) {
 
 export function DashboardPage() {
 	const { user } = useAuthState();
-	const { defaultTeamId } = useDefaultTeam();
-	const hasDefault = defaultTeamId !== null;
+	const { defaultTeamId, setDefault } = useDefaultTeam();
 
 	const { data: teams = [] } = useTeams();
-	const [manualTeamId, setManualTeamId] = useState<string | null>(null);
 
-	const selectedTeamId = hasDefault ? defaultTeamId : manualTeamId;
+	const selectedTeamId = defaultTeamId;
 	const activeTeamName = teams.find((t) => t.id === selectedTeamId)?.name;
 
 	const { data: productsResult } = useProducts(selectedTeamId, { limit: 1000 });
@@ -136,7 +132,7 @@ export function DashboardPage() {
 					</h1>
 					<p className="text-sm text-muted-foreground mt-0.5">
 						Aqui está um resumo do seu estoque
-						{hasDefault && activeTeamName && (
+						{activeTeamName && (
 							<>
 								{" "}
 								—{" "}
@@ -148,34 +144,28 @@ export function DashboardPage() {
 					</p>
 				</div>
 
-				{!hasDefault && (
-					<div className="flex items-center gap-3">
-						<span className="text-sm font-medium text-foreground shrink-0">
-							Equipe:
-						</span>
-						<Select
-							value={manualTeamId ?? ""}
-							onValueChange={(v) => setManualTeamId(v || null)}
-						>
-							<SelectTrigger className="w-52">
-								<SelectValue placeholder="Selecione uma equipe" />
-							</SelectTrigger>
-							<SelectContent>
-								{teams.map((team) => (
-									<SelectItem key={team.id} value={team.id}>
-										{team.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-						<Link
-							to="/configuracoes"
-							className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
-						>
-							Definir equipe padrão
-						</Link>
-					</div>
-				)}
+				<div className="flex items-center gap-3">
+					<span className="text-sm font-medium text-foreground shrink-0">
+						Equipe:
+					</span>
+					<Select
+						value={defaultTeamId ?? ""}
+						onValueChange={(v) => {
+							if (v) setDefault(v);
+						}}
+					>
+						<SelectTrigger className="w-52">
+							<SelectValue placeholder="Selecione uma equipe" />
+						</SelectTrigger>
+						<SelectContent>
+							{teams.map((team) => (
+								<SelectItem key={team.id} value={team.id}>
+									{team.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
 			</div>
 
 			<div className="flex flex-col gap-2">
