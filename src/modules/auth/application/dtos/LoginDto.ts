@@ -8,5 +8,6 @@ export interface LoginOutputDto {
 		id: string;
 		email: string;
 		name: string;
+		defaultTeamId: string | null;
 	};
 }

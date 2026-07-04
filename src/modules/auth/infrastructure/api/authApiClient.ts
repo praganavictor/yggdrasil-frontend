@@ -1,15 +1,18 @@
 import type { ChangePasswordDto } from "@/modules/auth/application/dtos/ChangePasswordDto";
 import { httpClient } from "@/shared/http/httpClient";
 
+interface ApiUser {
+	id: string;
+	email: string;
+	name: string;
+	defaultTeamId: string | null;
+}
+
 interface ApiLoginResponse {
 	access_token: string;
 	token_type: string;
 	expires_in: number;
-	user: {
-		id: string;
-		email: string;
-		name: string;
-	};
+	user: ApiUser;
 }
 
 export const authApiClient = {
@@ -26,8 +29,8 @@ export const authApiClient = {
 		});
 	},
 
-	me(token: string): Promise<{ id: string; email: string; name: string }> {
-		return httpClient.get<{ id: string; email: string; name: string }>("/me", {
+	me(token: string): Promise<ApiUser> {
+		return httpClient.get<ApiUser>("/me", {
 			headers: { Authorization: `Bearer ${token}` },
 		});
 	},
@@ -36,5 +39,13 @@ export const authApiClient = {
 		return httpClient.patch<void>("/change-password", dto, {
 			headers: { Authorization: `Bearer ${token}` },
 		});
+	},
+
+	setDefaultTeam(token: string, teamId: string | null): Promise<ApiUser> {
+		return httpClient.patch<ApiUser>(
+			"/me/default-team",
+			{ teamId },
+			{ headers: { Authorization: `Bearer ${token}` } },
+		);
 	},
 };

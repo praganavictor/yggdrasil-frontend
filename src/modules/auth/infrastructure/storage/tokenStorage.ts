@@ -27,7 +27,10 @@ export const tokenStorage = {
 
 	setToken(token: string): void {
 		localStorage.setItem(TOKEN_KEY, token);
-		localStorage.setItem(TOKEN_EXPIRY_KEY, String(Date.now() + SESSION_DURATION_MS));
+		localStorage.setItem(
+			TOKEN_EXPIRY_KEY,
+			String(Date.now() + SESSION_DURATION_MS),
+		);
 		emitAuthChange();
 	},
 
@@ -38,18 +41,34 @@ export const tokenStorage = {
 		emitAuthChange();
 	},
 
-	getUser(): { id: string; email: string; name: string } | null {
+	getUser(): {
+		id: string;
+		email: string;
+		name: string;
+		defaultTeamId: string | null;
+	} | null {
 		const raw = localStorage.getItem(USER_KEY);
 		if (!raw) return null;
 		try {
-			return JSON.parse(raw) as { id: string; email: string; name: string };
+			return JSON.parse(raw) as {
+				id: string;
+				email: string;
+				name: string;
+				defaultTeamId: string | null;
+			};
 		} catch {
 			return null;
 		}
 	},
 
-	setUser(user: { id: string; email: string; name: string }): void {
+	setUser(user: {
+		id: string;
+		email: string;
+		name: string;
+		defaultTeamId: string | null;
+	}): void {
 		localStorage.setItem(USER_KEY, JSON.stringify(user));
+		emitAuthChange();
 	},
 
 	isAuthenticated(): boolean {

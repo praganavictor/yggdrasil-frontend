@@ -3,7 +3,12 @@ import { tokenStorage } from "@/modules/auth/infrastructure/storage/tokenStorage
 
 interface AuthState {
 	isAuthenticated: boolean;
-	user: { id: string; email: string; name: string } | null;
+	user: {
+		id: string;
+		email: string;
+		name: string;
+		defaultTeamId: string | null;
+	} | null;
 }
 
 function getSnapshot(): AuthState {

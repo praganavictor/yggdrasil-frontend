@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
 	ArrowDownCircleIcon,
 	ArrowUpCircleIcon,
@@ -25,9 +26,8 @@ import {
 import { useAuthState } from "@/modules/auth/presentation/hooks/useAuthState";
 import { useProducts } from "@/modules/products/presentation/hooks/useProducts";
 import { useStockMoviments } from "@/modules/stockMoviment/presentation/hooks/useStockMoviments";
-import { Link } from "@tanstack/react-router";
+import { useDefaultTeam } from "@/modules/teams/presentation/hooks/useDefaultTeam";
 import { useTeams } from "@/modules/teams/presentation/hooks/useTeams";
-import { defaultTeamStorage } from "@/shared/storage/defaultTeamStorage";
 
 const currency = new Intl.NumberFormat("pt-BR", {
 	style: "currency",
@@ -92,7 +92,7 @@ function TypeBadge({ type }: { type: string }) {
 
 export function DashboardPage() {
 	const { user } = useAuthState();
-	const defaultTeamId = defaultTeamStorage.get();
+	const { defaultTeamId } = useDefaultTeam();
 	const hasDefault = defaultTeamId !== null;
 
 	const { data: teams = [] } = useTeams();
@@ -137,14 +137,22 @@ export function DashboardPage() {
 					<p className="text-sm text-muted-foreground mt-0.5">
 						Aqui está um resumo do seu estoque
 						{hasDefault && activeTeamName && (
-							<> — <span className="font-medium text-foreground">{activeTeamName}</span></>
+							<>
+								{" "}
+								—{" "}
+								<span className="font-medium text-foreground">
+									{activeTeamName}
+								</span>
+							</>
 						)}
 					</p>
 				</div>
 
 				{!hasDefault && (
 					<div className="flex items-center gap-3">
-						<span className="text-sm font-medium text-foreground shrink-0">Equipe:</span>
+						<span className="text-sm font-medium text-foreground shrink-0">
+							Equipe:
+						</span>
 						<Select
 							value={manualTeamId ?? ""}
 							onValueChange={(v) => setManualTeamId(v || null)}

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
 	ArrowDownCircleIcon,
 	ArrowUpCircleIcon,
@@ -5,7 +6,6 @@ import {
 	PlusIcon,
 	TrashIcon,
 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { useProducts } from "@/modules/products/presentation/hooks/useProducts";
 import type { CreateStockMovimentDto } from "@/modules/stockMoviment/application/dtos/StockMovimentDto";
 import type { StockMoviment } from "@/modules/stockMoviment/domain/entities/StockMoviment";
 import { DeleteStockMovimentDialog } from "@/modules/stockMoviment/presentation/components/DeleteStockMovimentDialog";
@@ -34,9 +35,8 @@ import { useCreateStockMoviment } from "@/modules/stockMoviment/presentation/hoo
 import { useDeleteStockMoviment } from "@/modules/stockMoviment/presentation/hooks/useDeleteStockMoviment";
 import { useStockMoviments } from "@/modules/stockMoviment/presentation/hooks/useStockMoviments";
 import { useUpdateStockMoviment } from "@/modules/stockMoviment/presentation/hooks/useUpdateStockMoviment";
-import { useProducts } from "@/modules/products/presentation/hooks/useProducts";
+import { useDefaultTeam } from "@/modules/teams/presentation/hooks/useDefaultTeam";
 import { useTeams } from "@/modules/teams/presentation/hooks/useTeams";
-import { defaultTeamStorage } from "@/shared/storage/defaultTeamStorage";
 
 const currency = new Intl.NumberFormat("pt-BR", {
 	style: "currency",
@@ -67,7 +67,7 @@ function TypeBadge({ type }: { type: string }) {
 }
 
 export function StockMovimentsPage() {
-	const defaultTeamId = defaultTeamStorage.get();
+	const { defaultTeamId } = useDefaultTeam();
 	const hasDefault = defaultTeamId !== null;
 
 	const { data: teams = [] } = useTeams();
@@ -102,9 +102,12 @@ export function StockMovimentsPage() {
 	const deleteMoviment = useDeleteStockMoviment();
 
 	const [formOpen, setFormOpen] = useState(false);
-	const [editingMoviment, setEditingMoviment] = useState<StockMoviment | undefined>(undefined);
+	const [editingMoviment, setEditingMoviment] = useState<
+		StockMoviment | undefined
+	>(undefined);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-	const [deletingMoviment, setDeletingMoviment] = useState<StockMoviment | null>(null);
+	const [deletingMoviment, setDeletingMoviment] =
+		useState<StockMoviment | null>(null);
 
 	function handleNew() {
 		setEditingMoviment(undefined);
@@ -163,7 +166,9 @@ export function StockMovimentsPage() {
 
 			{!hasDefault && (
 				<div className="flex items-center gap-3">
-					<span className="text-sm font-medium text-foreground shrink-0">Equipe:</span>
+					<span className="text-sm font-medium text-foreground shrink-0">
+						Equipe:
+					</span>
 					<Select
 						value={manualTeamId ?? ""}
 						onValueChange={(v) => setManualTeamId(v || null)}
@@ -190,7 +195,9 @@ export function StockMovimentsPage() {
 
 			{selectedTeamId && (
 				<div className="flex items-center gap-3">
-					<span className="text-sm font-medium text-foreground shrink-0">Produto:</span>
+					<span className="text-sm font-medium text-foreground shrink-0">
+						Produto:
+					</span>
 					<Select
 						value={productFilter || "all"}
 						onValueChange={(v) => setProductFilter(v === "all" ? "" : v)}
@@ -233,15 +240,18 @@ export function StockMovimentsPage() {
 						</div>
 					)}
 
-					{selectedTeamId && !isLoading && !isError && moviments.length === 0 && (
-						<div className="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground">
-							<p className="text-sm">Nenhuma movimentação registrada.</p>
-							<Button variant="outline" size="sm" onClick={handleNew}>
-								<PlusIcon />
-								Registrar primeira movimentação
-							</Button>
-						</div>
-					)}
+					{selectedTeamId &&
+						!isLoading &&
+						!isError &&
+						moviments.length === 0 && (
+							<div className="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground">
+								<p className="text-sm">Nenhuma movimentação registrada.</p>
+								<Button variant="outline" size="sm" onClick={handleNew}>
+									<PlusIcon />
+									Registrar primeira movimentação
+								</Button>
+							</div>
+						)}
 
 					{selectedTeamId && !isLoading && !isError && moviments.length > 0 && (
 						<Table>

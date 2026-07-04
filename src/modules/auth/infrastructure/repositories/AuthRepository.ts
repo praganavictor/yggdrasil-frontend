@@ -20,8 +20,6 @@ export class AuthRepository implements IAuthRepository {
 				credentials.password,
 			);
 
-			console.log("Login response:", response);
-
 			const user = createUser(response.user);
 			const token = createAuthToken(response);
 
@@ -45,7 +43,11 @@ export class AuthRepository implements IAuthRepository {
 					error,
 				);
 			}
-			throw new AuthError("UNKNOWN", "An error occurred. Please try again.", error);
+			throw new AuthError(
+				"UNKNOWN",
+				"An error occurred. Please try again.",
+				error,
+			);
 		}
 	}
 
@@ -74,5 +76,30 @@ export class AuthRepository implements IAuthRepository {
 		const token = tokenStorage.getToken();
 		if (!token) throw new AuthError("UNKNOWN", "Not authenticated");
 		await authApiClient.changePassword(token, dto);
+	}
+
+	async setDefaultTeam(teamId: string | null): Promise<User> {
+		const token = tokenStorage.getToken();
+		if (!token) throw new AuthError("UNKNOWN", "Not authenticated");
+
+		try {
+			const updated = await authApiClient.setDefaultTeam(token, teamId);
+			tokenStorage.setUser(updated);
+			return createUser(updated);
+		} catch (error) {
+			if (error instanceof HttpError) {
+				const body = error.body as Record<string, unknown> | null;
+				const message =
+					typeof body?.message === "string"
+						? body.message
+						: "An error occurred. Please try again.";
+				throw new AuthError("UNKNOWN", message);
+			}
+			throw new AuthError(
+				"UNKNOWN",
+				"An error occurred. Please try again.",
+				error,
+			);
+		}
 	}
 }

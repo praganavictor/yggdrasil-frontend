@@ -21,6 +21,7 @@ export class LoginUseCase {
 					id: result.user.id,
 					email: result.user.email,
 					name: result.user.name,
+					defaultTeamId: result.user.defaultTeamId,
 				},
 			};
 		} catch (error) {

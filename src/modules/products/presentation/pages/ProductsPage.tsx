@@ -4,12 +4,7 @@ import { useEffect, useState } from "react";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -34,8 +29,8 @@ import { useCreateProduct } from "@/modules/products/presentation/hooks/useCreat
 import { useDeleteProduct } from "@/modules/products/presentation/hooks/useDeleteProduct";
 import { useProducts } from "@/modules/products/presentation/hooks/useProducts";
 import { useUpdateProduct } from "@/modules/products/presentation/hooks/useUpdateProduct";
+import { useDefaultTeam } from "@/modules/teams/presentation/hooks/useDefaultTeam";
 import { useTeams } from "@/modules/teams/presentation/hooks/useTeams";
-import { defaultTeamStorage } from "@/shared/storage/defaultTeamStorage";
 
 function formatCurrency(value: number) {
 	return new Intl.NumberFormat("pt-BR", {
@@ -44,14 +39,21 @@ function formatCurrency(value: number) {
 	}).format(value);
 }
 
-function StockBadge({ quantity, minimum }: { quantity: number; minimum: number }) {
+function StockBadge({
+	quantity,
+	minimum,
+}: {
+	quantity: number;
+	minimum: number;
+}) {
 	if (quantity === 0) return <Badge variant="destructive">Sem estoque</Badge>;
-	if (quantity <= minimum) return <Badge variant="warning">Estoque baixo</Badge>;
+	if (quantity <= minimum)
+		return <Badge variant="warning">Estoque baixo</Badge>;
 	return <Badge variant="success">Em estoque</Badge>;
 }
 
 export function ProductsPage() {
-	const defaultTeamId = defaultTeamStorage.get();
+	const { defaultTeamId } = useDefaultTeam();
 	const hasDefault = defaultTeamId !== null;
 
 	const { data: teams = [] } = useTeams();
@@ -89,7 +91,9 @@ export function ProductsPage() {
 	const deleteProduct = useDeleteProduct();
 
 	const [formOpen, setFormOpen] = useState(false);
-	const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
+	const [editingProduct, setEditingProduct] = useState<Product | undefined>(
+		undefined,
+	);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
@@ -152,7 +156,9 @@ export function ProductsPage() {
 
 			{!hasDefault && (
 				<div className="flex items-center gap-3">
-					<span className="text-sm font-medium text-foreground shrink-0">Equipe:</span>
+					<span className="text-sm font-medium text-foreground shrink-0">
+						Equipe:
+					</span>
 					<Select
 						value={manualTeamId ?? ""}
 						onValueChange={(v) => setManualTeamId(v || null)}
@@ -179,7 +185,9 @@ export function ProductsPage() {
 
 			{selectedTeamId && (
 				<div className="flex items-center gap-3">
-					<span className="text-sm font-medium text-foreground shrink-0">Categoria:</span>
+					<span className="text-sm font-medium text-foreground shrink-0">
+						Categoria:
+					</span>
 					<Input
 						value={categoryInput}
 						onChange={(e) => setCategoryInput(e.target.value)}
@@ -212,15 +220,18 @@ export function ProductsPage() {
 						</div>
 					)}
 
-					{selectedTeamId && !isLoading && !isError && products.length === 0 && (
-						<div className="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground">
-							<p className="text-sm">Nenhum produto cadastrado.</p>
-							<Button variant="outline" size="sm" onClick={handleNewProduct}>
-								<PlusIcon />
-								Cadastrar primeiro produto
-							</Button>
-						</div>
-					)}
+					{selectedTeamId &&
+						!isLoading &&
+						!isError &&
+						products.length === 0 && (
+							<div className="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground">
+								<p className="text-sm">Nenhum produto cadastrado.</p>
+								<Button variant="outline" size="sm" onClick={handleNewProduct}>
+									<PlusIcon />
+									Cadastrar primeiro produto
+								</Button>
+							</div>
+						)}
 
 					{selectedTeamId && !isLoading && !isError && products.length > 0 && (
 						<Table>
@@ -246,9 +257,13 @@ export function ProductsPage() {
 										</TableCell>
 										<TableCell>{product.category}</TableCell>
 										<TableCell>{product.subcategory}</TableCell>
-										<TableCell className="text-muted-foreground">{product.local}</TableCell>
+										<TableCell className="text-muted-foreground">
+											{product.local}
+										</TableCell>
 										<TableCell>{product.unity}</TableCell>
-										<TableCell className="text-right tabular-nums">{product.quantity}</TableCell>
+										<TableCell className="text-right tabular-nums">
+											{product.quantity}
+										</TableCell>
 										<TableCell className="text-right tabular-nums text-muted-foreground">
 											{product.minumum}
 										</TableCell>
@@ -256,7 +271,10 @@ export function ProductsPage() {
 											{formatCurrency(product.price)}
 										</TableCell>
 										<TableCell>
-											<StockBadge quantity={product.quantity} minimum={product.minumum} />
+											<StockBadge
+												quantity={product.quantity}
+												minimum={product.minumum}
+											/>
 										</TableCell>
 										<TableCell>
 											<div className="flex items-center gap-1">

@@ -17,4 +17,5 @@ export interface IAuthRepository {
 	logout(): Promise<void>;
 	getCurrentUser(): Promise<User | null>;
 	changePassword(dto: ChangePasswordDto): Promise<void>;
+	setDefaultTeam(teamId: string | null): Promise<User>;
 }
