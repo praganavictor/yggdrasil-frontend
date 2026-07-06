@@ -18,4 +18,6 @@ export interface ProductQueryParams {
 	limit?: number;
 	category?: string;
 	isPortioned?: boolean;
+	belowMinimum?: boolean;
+	outOfStock?: boolean;
 }

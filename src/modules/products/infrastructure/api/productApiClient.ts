@@ -25,6 +25,8 @@ export const productApiClient = {
 		if (params?.isPortioned !== undefined) {
 			query.set("isPortioned", String(params.isPortioned));
 		}
+		if (params?.belowMinimum) query.set("belowMinimum", "true");
+		if (params?.outOfStock) query.set("outOfStock", "true");
 		const queryString = query.toString();
 
 		return httpClient.get<PaginatedResult<Product>>(

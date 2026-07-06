@@ -51,6 +51,8 @@ export function ProductsPage() {
 	const [categoryInput, setCategoryInput] = useState("");
 	const [category, setCategory] = useState("");
 	const [onlyPortioned, setOnlyPortioned] = useState(false);
+	const [onlyBelowMinimum, setOnlyBelowMinimum] = useState(false);
+	const [onlyOutOfStock, setOnlyOutOfStock] = useState(false);
 
 	useEffect(() => {
 		const timeout = setTimeout(() => setCategory(categoryInput.trim()), 400);
@@ -59,7 +61,23 @@ export function ProductsPage() {
 
 	useEffect(() => {
 		setPage(1);
-	}, [selectedTeamId, category, onlyPortioned]);
+	}, [
+		selectedTeamId,
+		category,
+		onlyPortioned,
+		onlyBelowMinimum,
+		onlyOutOfStock,
+	]);
+
+	function handleBelowMinimumChange(checked: boolean) {
+		setOnlyBelowMinimum(checked);
+		if (checked) setOnlyOutOfStock(false);
+	}
+
+	function handleOutOfStockChange(checked: boolean) {
+		setOnlyOutOfStock(checked);
+		if (checked) setOnlyBelowMinimum(false);
+	}
 
 	const {
 		data: result,
@@ -70,6 +88,8 @@ export function ProductsPage() {
 		limit,
 		category: category || undefined,
 		isPortioned: onlyPortioned ? true : undefined,
+		belowMinimum: onlyBelowMinimum ? true : undefined,
+		outOfStock: onlyOutOfStock ? true : undefined,
 	});
 	const products = result?.data ?? [];
 	const meta = result?.meta;
@@ -186,7 +206,7 @@ export function ProductsPage() {
 			)}
 
 			{selectedTeamId && (
-				<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+				<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
 					<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
 						<span className="text-sm font-medium text-foreground shrink-0">
 							Categoria:
@@ -207,6 +227,28 @@ export function ProductsPage() {
 						/>
 						<Label htmlFor="only-portioned" className="font-normal">
 							Somente porcionados
+						</Label>
+					</div>
+
+					<div className="flex items-center gap-2">
+						<Switch
+							id="only-below-minimum"
+							checked={onlyBelowMinimum}
+							onCheckedChange={handleBelowMinimumChange}
+						/>
+						<Label htmlFor="only-below-minimum" className="font-normal">
+							Abaixo do mínimo
+						</Label>
+					</div>
+
+					<div className="flex items-center gap-2">
+						<Switch
+							id="only-out-of-stock"
+							checked={onlyOutOfStock}
+							onCheckedChange={handleOutOfStockChange}
+						/>
+						<Label htmlFor="only-out-of-stock" className="font-normal">
+							Sem estoque
 						</Label>
 					</div>
 				</div>

@@ -4,8 +4,10 @@ import {
 	Home,
 	LogOut,
 	Menu,
+	Moon,
 	Package,
 	Settings,
+	Sun,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,10 +19,12 @@ import {
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import { useLogout } from "@/modules/auth/presentation/hooks/useLogout";
+import { useTheme } from "@/shared/hooks/useTheme";
 
 export default function Header() {
 	const [open, setOpen] = useState(false);
 	const { logout, isPending } = useLogout();
+	const { theme, toggleTheme } = useTheme();
 
 	return (
 		<header className="flex items-center gap-3 border-b bg-gray-900 px-4 py-3 shadow-sm">
@@ -78,18 +82,33 @@ export default function Header() {
 						</Link>
 						<div className="my-2 border-t" />
 
-						<Link
-							to="/configuracoes"
-							onClick={() => setOpen(false)}
-							className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-							activeProps={{
-								className:
-									"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
-							}}
-						>
-							<Settings size={18} />
-							Configurações
-						</Link>
+						<div className="flex items-center gap-1">
+							<Link
+								to="/configuracoes"
+								onClick={() => setOpen(false)}
+								className="flex flex-1 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+								activeProps={{
+									className:
+										"flex flex-1 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors",
+								}}
+							>
+								<Settings size={18} />
+								Configurações
+							</Link>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="size-10 shrink-0 text-foreground hover:bg-muted"
+								aria-label={
+									theme === "dark"
+										? "Mudar para tema claro"
+										: "Mudar para tema escuro"
+								}
+								onClick={toggleTheme}
+							>
+								{theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+							</Button>
+						</div>
 					</nav>
 				</SheetContent>
 			</Sheet>
