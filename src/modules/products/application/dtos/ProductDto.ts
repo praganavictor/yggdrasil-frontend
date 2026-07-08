@@ -1,6 +1,7 @@
 export interface CreateProductDto {
 	name: string;
 	description: string;
+	barcode?: string;
 	local: string;
 	category: string;
 	subcategory: string;

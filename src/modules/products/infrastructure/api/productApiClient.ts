@@ -35,6 +35,13 @@ export const productApiClient = {
 		);
 	},
 
+	findByBarcode(teamId: string, barcode: string): Promise<Product> {
+		return httpClient.get<Product>(
+			`/teams/${teamId}/products/barcode/${encodeURIComponent(barcode)}`,
+			{ headers: authHeaders() },
+		);
+	},
+
 	findById(id: string): Promise<Product> {
 		return httpClient.get<Product>(`/products/${id}`, {
 			headers: authHeaders(),

@@ -3,9 +3,11 @@ import {
 	ArrowDownCircleIcon,
 	ArrowUpCircleIcon,
 	PackageIcon,
+	ScanBarcodeIcon,
 	TriangleAlertIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	Select,
@@ -140,7 +142,7 @@ export function DashboardPage() {
 	const firstName = user?.name?.split(" ")[0] ?? "usuário";
 
 	return (
-		<div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-6">
+		<div className="p-4 sm:p-6 pb-24 flex flex-col gap-4 sm:gap-6">
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div>
 					<h1 className="text-2xl font-semibold text-foreground">
@@ -298,6 +300,16 @@ export function DashboardPage() {
 					</CardContent>
 				</Card>
 			)}
+
+			<Button
+				asChild
+				size="icon"
+				className="fixed bottom-5 left-5 z-40 size-14 rounded-full shadow-lg [&_svg]:size-6"
+			>
+				<Link to="/scanner" aria-label="Escanear código de barras">
+					<ScanBarcodeIcon />
+				</Link>
+			</Button>
 		</div>
 	);
 }

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedScannerIndexRouteImport } from './routes/_authenticated/scanner/index'
 import { Route as AuthenticatedProdutosIndexRouteImport } from './routes/_authenticated/produtos/index'
 import { Route as AuthenticatedMovimentacoesIndexRouteImport } from './routes/_authenticated/movimentacoes/index'
 import { Route as AuthenticatedEquipesIndexRouteImport } from './routes/_authenticated/equipes/index'
@@ -31,6 +32,12 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedScannerIndexRoute =
+  AuthenticatedScannerIndexRouteImport.update({
+    id: '/scanner/',
+    path: '/scanner/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedProdutosIndexRoute =
   AuthenticatedProdutosIndexRouteImport.update({
     id: '/produtos/',
@@ -63,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/equipes': typeof AuthenticatedEquipesIndexRoute
   '/movimentacoes': typeof AuthenticatedMovimentacoesIndexRoute
   '/produtos': typeof AuthenticatedProdutosIndexRoute
+  '/scanner': typeof AuthenticatedScannerIndexRoute
 }
 export interface FileRoutesByTo {
   '/entrar': typeof EntrarRoute
@@ -71,6 +79,7 @@ export interface FileRoutesByTo {
   '/equipes': typeof AuthenticatedEquipesIndexRoute
   '/movimentacoes': typeof AuthenticatedMovimentacoesIndexRoute
   '/produtos': typeof AuthenticatedProdutosIndexRoute
+  '/scanner': typeof AuthenticatedScannerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -81,6 +90,7 @@ export interface FileRoutesById {
   '/_authenticated/equipes/': typeof AuthenticatedEquipesIndexRoute
   '/_authenticated/movimentacoes/': typeof AuthenticatedMovimentacoesIndexRoute
   '/_authenticated/produtos/': typeof AuthenticatedProdutosIndexRoute
+  '/_authenticated/scanner/': typeof AuthenticatedScannerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +101,7 @@ export interface FileRouteTypes {
     | '/equipes'
     | '/movimentacoes'
     | '/produtos'
+    | '/scanner'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/entrar'
@@ -99,6 +110,7 @@ export interface FileRouteTypes {
     | '/equipes'
     | '/movimentacoes'
     | '/produtos'
+    | '/scanner'
   id:
     | '__root__'
     | '/_authenticated'
@@ -108,6 +120,7 @@ export interface FileRouteTypes {
     | '/_authenticated/equipes/'
     | '/_authenticated/movimentacoes/'
     | '/_authenticated/produtos/'
+    | '/_authenticated/scanner/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -136,6 +149,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/scanner/': {
+      id: '/_authenticated/scanner/'
+      path: '/scanner'
+      fullPath: '/scanner'
+      preLoaderRoute: typeof AuthenticatedScannerIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/produtos/': {
@@ -175,6 +195,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedEquipesIndexRoute: typeof AuthenticatedEquipesIndexRoute
   AuthenticatedMovimentacoesIndexRoute: typeof AuthenticatedMovimentacoesIndexRoute
   AuthenticatedProdutosIndexRoute: typeof AuthenticatedProdutosIndexRoute
+  AuthenticatedScannerIndexRoute: typeof AuthenticatedScannerIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -183,6 +204,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedEquipesIndexRoute: AuthenticatedEquipesIndexRoute,
   AuthenticatedMovimentacoesIndexRoute: AuthenticatedMovimentacoesIndexRoute,
   AuthenticatedProdutosIndexRoute: AuthenticatedProdutosIndexRoute,
+  AuthenticatedScannerIndexRoute: AuthenticatedScannerIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

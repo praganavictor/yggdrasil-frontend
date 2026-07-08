@@ -12,6 +12,7 @@ export interface IProductRepository {
 		params?: ProductQueryParams,
 	): Promise<PaginatedResult<Product>>;
 	findById(id: string): Promise<Product>;
+	findByBarcode(teamId: string, barcode: string): Promise<Product>;
 	create(teamId: string, dto: CreateProductDto): Promise<Product>;
 	update(id: string, dto: UpdateProductDto): Promise<Product>;
 	delete(id: string): Promise<void>;

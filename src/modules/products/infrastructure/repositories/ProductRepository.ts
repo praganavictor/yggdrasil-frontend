@@ -20,6 +20,10 @@ export class ProductRepository implements IProductRepository {
 		return productApiClient.findById(id);
 	}
 
+	findByBarcode(teamId: string, barcode: string): Promise<Product> {
+		return productApiClient.findByBarcode(teamId, barcode);
+	}
+
 	create(teamId: string, dto: CreateProductDto): Promise<Product> {
 		return productApiClient.create(teamId, dto);
 	}
