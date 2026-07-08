@@ -7,7 +7,13 @@ import { CameraIcon, CameraOffIcon, ScanBarcodeIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
-type ScannerStatus = "idle" | "starting" | "scanning" | "denied" | "error";
+type ScannerStatus =
+	| "idle"
+	| "starting"
+	| "scanning"
+	| "denied"
+	| "insecure"
+	| "error";
 
 interface BarcodeScannerCameraProps {
 	onDetected: (barcode: string) => void;
@@ -36,6 +42,7 @@ export function BarcodeScannerCamera({
 	const controlsRef = useRef<IScannerControls | null>(null);
 	const detectedRef = useRef(false);
 	const [status, setStatus] = useState<ScannerStatus>("idle");
+	const [errorDetail, setErrorDetail] = useState<string | null>(null);
 
 	const stopScanning = useCallback(() => {
 		controlsRef.current?.stop();
@@ -46,7 +53,14 @@ export function BarcodeScannerCamera({
 
 	async function startScanning() {
 		if (!videoRef.current) return;
+
+		if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+			setStatus("insecure");
+			return;
+		}
+
 		setStatus("starting");
+		setErrorDetail(null);
 		detectedRef.current = false;
 
 		try {
@@ -70,6 +84,13 @@ export function BarcodeScannerCamera({
 				error instanceof DOMException &&
 				(error.name === "NotAllowedError" ||
 					error.name === "PermissionDeniedError");
+			if (!isPermissionError) {
+				setErrorDetail(
+					error instanceof Error
+						? `${error.name}: ${error.message}`
+						: String(error),
+				);
+			}
 			setStatus(isPermissionError ? "denied" : "error");
 		}
 	}
@@ -102,12 +123,25 @@ export function BarcodeScannerCamera({
 									configurações do navegador e tente novamente.
 								</p>
 							</>
+						) : status === "insecure" ? (
+							<>
+								<CameraOffIcon className="size-8 text-white/70" />
+								<p className="text-sm text-white/80">
+									O navegador bloqueou a câmera porque a conexão não é segura.
+									Acesse o sistema por um endereço https:// para usar o scanner.
+								</p>
+							</>
 						) : status === "error" ? (
 							<>
 								<CameraOffIcon className="size-8 text-white/70" />
 								<p className="text-sm text-white/80">
 									Não foi possível acessar a câmera do dispositivo.
 								</p>
+								{errorDetail && (
+									<p className="font-mono text-xs text-white/50">
+										{errorDetail}
+									</p>
+								)}
 							</>
 						) : (
 							<>
