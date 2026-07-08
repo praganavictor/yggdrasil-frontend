@@ -19,6 +19,8 @@ interface BarcodeScannerCameraProps {
 	onDetected: (barcode: string) => void;
 }
 
+const DETECTION_COOLDOWN_MS = 2000;
+
 const hints = new Map([
 	[
 		DecodeHintType.POSSIBLE_FORMATS,
@@ -40,7 +42,9 @@ export function BarcodeScannerCamera({
 }: BarcodeScannerCameraProps) {
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const controlsRef = useRef<IScannerControls | null>(null);
-	const detectedRef = useRef(false);
+	const lastDetectionRef = useRef<{ code: string; at: number } | null>(null);
+	const onDetectedRef = useRef(onDetected);
+	onDetectedRef.current = onDetected;
 	const [status, setStatus] = useState<ScannerStatus>("idle");
 	const [errorDetail, setErrorDetail] = useState<string | null>(null);
 
@@ -61,7 +65,7 @@ export function BarcodeScannerCamera({
 
 		setStatus("starting");
 		setErrorDetail(null);
-		detectedRef.current = false;
+		lastDetectionRef.current = null;
 
 		try {
 			const reader = new BrowserMultiFormatReader(hints);
@@ -69,12 +73,18 @@ export function BarcodeScannerCamera({
 				{ video: { facingMode: "environment" } },
 				videoRef.current,
 				(result) => {
-					if (!result || detectedRef.current) return;
-					detectedRef.current = true;
-					stopScanning();
+					if (!result) return;
+					const code = result.getText();
+					const now = Date.now();
+					const last = lastDetectionRef.current;
+					// Enquanto o mesmo código continua visível, só renova o timestamp
+					// para não disparar de novo; um código novo dispara na hora.
+					const isRepeat =
+						last?.code === code && now - last.at < DETECTION_COOLDOWN_MS;
+					lastDetectionRef.current = { code, at: now };
+					if (isRepeat) return;
 					navigator.vibrate?.(100);
-					setStatus("idle");
-					onDetected(result.getText());
+					onDetectedRef.current(code);
 				},
 			);
 			setStatus("scanning");
@@ -98,78 +108,62 @@ export function BarcodeScannerCamera({
 	const isActive = status === "scanning" || status === "starting";
 
 	return (
-		<div className="flex flex-col gap-3">
-			<div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border bg-black">
-				<video
-					ref={videoRef}
-					className={`h-full w-full object-cover ${isActive ? "" : "hidden"}`}
-					muted
-					playsInline
-				/>
+		<div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border bg-black">
+			<video
+				ref={videoRef}
+				className={`h-full w-full object-cover ${isActive ? "" : "hidden"}`}
+				muted
+				playsInline
+			/>
 
-				{status === "scanning" && (
-					<div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-						<div className="h-24 w-4/5 rounded-lg border-2 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
-					</div>
-				)}
+			{status === "scanning" && (
+				<div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+					<div className="h-24 w-4/5 rounded-lg border-2 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
+				</div>
+			)}
 
-				{!isActive && (
-					<div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-						{status === "denied" ? (
-							<>
-								<CameraOffIcon className="size-8 text-white/70" />
-								<p className="text-sm text-white/80">
-									Permissão de câmera negada. Libere o acesso à câmera nas
-									configurações do navegador e tente novamente.
-								</p>
-							</>
-						) : status === "insecure" ? (
-							<>
-								<CameraOffIcon className="size-8 text-white/70" />
-								<p className="text-sm text-white/80">
-									O navegador bloqueou a câmera porque a conexão não é segura.
-									Acesse o sistema por um endereço https:// para usar o scanner.
-								</p>
-							</>
-						) : status === "error" ? (
-							<>
-								<CameraOffIcon className="size-8 text-white/70" />
-								<p className="text-sm text-white/80">
-									Não foi possível acessar a câmera do dispositivo.
-								</p>
-								{errorDetail && (
-									<p className="font-mono text-xs text-white/50">
-										{errorDetail}
-									</p>
-								)}
-							</>
-						) : (
-							<>
-								<ScanBarcodeIcon className="size-8 text-white/70" />
-								<p className="text-sm text-white/80">
-									Aponte a câmera para o código de barras do produto. Será
-									pedida permissão para usar a câmera.
-								</p>
-							</>
-						)}
-						<Button onClick={startScanning} className="gap-2">
-							<CameraIcon className="size-4" />
-							{status === "idle" ? "Ativar câmera" : "Tentar novamente"}
-						</Button>
-					</div>
-				)}
-			</div>
-
-			{isActive && (
-				<Button
-					variant="outline"
-					onClick={() => {
-						stopScanning();
-						setStatus("idle");
-					}}
-				>
-					Parar leitura
-				</Button>
+			{!isActive && (
+				<div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
+					{status === "denied" ? (
+						<>
+							<CameraOffIcon className="size-8 text-white/70" />
+							<p className="text-sm text-white/80">
+								Permissão de câmera negada. Libere o acesso à câmera nas
+								configurações do navegador e tente novamente.
+							</p>
+						</>
+					) : status === "insecure" ? (
+						<>
+							<CameraOffIcon className="size-8 text-white/70" />
+							<p className="text-sm text-white/80">
+								O navegador bloqueou a câmera porque a conexão não é segura.
+								Acesse o sistema por um endereço https:// para usar o scanner.
+							</p>
+						</>
+					) : status === "error" ? (
+						<>
+							<CameraOffIcon className="size-8 text-white/70" />
+							<p className="text-sm text-white/80">
+								Não foi possível acessar a câmera do dispositivo.
+							</p>
+							{errorDetail && (
+								<p className="font-mono text-xs text-white/50">{errorDetail}</p>
+							)}
+						</>
+					) : (
+						<>
+							<ScanBarcodeIcon className="size-8 text-white/70" />
+							<p className="text-sm text-white/80">
+								Aponte a câmera para o código de barras do produto. Será pedida
+								permissão para usar a câmera.
+							</p>
+						</>
+					)}
+					<Button onClick={startScanning} className="gap-2">
+						<CameraIcon className="size-4" />
+						{status === "idle" ? "Ativar câmera" : "Tentar novamente"}
+					</Button>
+				</div>
 			)}
 		</div>
 	);
