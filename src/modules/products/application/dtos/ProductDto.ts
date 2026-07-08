@@ -12,7 +12,9 @@ export interface CreateProductDto {
 	isPortioned: boolean;
 }
 
-export type UpdateProductDto = Partial<CreateProductDto>;
+export type UpdateProductDto = Partial<Omit<CreateProductDto, "barcode">> & {
+	barcode?: string | null;
+};
 
 export interface ProductQueryParams {
 	page?: number;

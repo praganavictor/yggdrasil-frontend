@@ -19,6 +19,7 @@ interface AssociateBarcodeSheetProps {
 	onOpenChange: (open: boolean) => void;
 	barcode: string;
 	teamId: string | null;
+	currentProductId?: string;
 }
 
 export function AssociateBarcodeSheet({
@@ -26,6 +27,7 @@ export function AssociateBarcodeSheet({
 	onOpenChange,
 	barcode,
 	teamId,
+	currentProductId,
 }: AssociateBarcodeSheetProps) {
 	const isMobile = useIsMobile();
 	const [search, setSearch] = useState("");
@@ -42,16 +44,26 @@ export function AssociateBarcodeSheet({
 			)
 		: products;
 
-	function handleSelect(product: Product) {
-		updateProduct.mutate(
-			{ id: product.id, dto: { barcode } },
-			{
-				onSuccess: () => {
-					onOpenChange(false);
-					setSearch("");
-				},
-			},
-		);
+	async function handleSelect(product: Product) {
+		if (product.id === currentProductId) {
+			onOpenChange(false);
+			return;
+		}
+		try {
+			// O código é único por equipe: libera o produto atual antes de
+			// associar ao novo, senão o backend rejeita por duplicidade.
+			if (currentProductId) {
+				await updateProduct.mutateAsync({
+					id: currentProductId,
+					dto: { barcode: null },
+				});
+			}
+			await updateProduct.mutateAsync({ id: product.id, dto: { barcode } });
+			onOpenChange(false);
+			setSearch("");
+		} catch {
+			// updateProduct.isError já exibe a mensagem de erro no sheet
+		}
 	}
 
 	return (
