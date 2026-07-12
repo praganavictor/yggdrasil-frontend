@@ -2,10 +2,13 @@ import { Link } from "@tanstack/react-router";
 import {
 	ArrowDownCircleIcon,
 	ArrowUpCircleIcon,
+	ChevronRightIcon,
 	PackageIcon,
 	ScanBarcodeIcon,
 	TriangleAlertIcon,
+	UsersIcon,
 } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,10 +28,16 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { useAuthState } from "@/modules/auth/presentation/hooks/useAuthState";
+import {
+	type TeamSummary,
+	useTeamsSummaries,
+} from "@/modules/dashboard/presentation/hooks/useTeamsSummaries";
 import { useProducts } from "@/modules/products/presentation/hooks/useProducts";
 import { useStockMoviments } from "@/modules/stockMoviment/presentation/hooks/useStockMoviments";
 import { useDefaultTeam } from "@/modules/teams/presentation/hooks/useDefaultTeam";
 import { useTeams } from "@/modules/teams/presentation/hooks/useTeams";
+
+const ALL_TEAMS = "all";
 
 const currency = new Intl.NumberFormat("pt-BR", {
 	style: "currency",
@@ -106,21 +115,132 @@ function TypeBadge({ type }: { type: string }) {
 	);
 }
 
+function TeamSummaryCard({
+	summary,
+	onSelect,
+}: {
+	summary: TeamSummary;
+	onSelect: () => void;
+}) {
+	const { team, products, moviments, isLoading } = summary;
+	const lowStock = products.filter(
+		(p) => p.quantity > 0 && p.quantity <= p.minumum,
+	).length;
+	const outOfStock = products.filter((p) => p.quantity === 0).length;
+	const totalEntradas = moviments
+		.filter((m) => m.type === "entrada")
+		.reduce((acc, m) => acc + m.quantity * m.price, 0);
+	const totalSaidas = moviments
+		.filter((m) => m.type === "saída")
+		.reduce((acc, m) => acc + m.quantity * m.price, 0);
+
+	return (
+		<button type="button" onClick={onSelect} className="w-full text-left">
+			<Card size="sm" className="h-full transition-colors hover:bg-accent">
+				<CardHeader className="border-b">
+					<div className="flex items-center justify-between gap-2">
+						<div className="flex min-w-0 items-center gap-2">
+							<UsersIcon className="size-4 shrink-0 text-muted-foreground" />
+							<span className="truncate font-medium text-foreground">
+								{team.name}
+							</span>
+						</div>
+						<ChevronRightIcon className="size-4 shrink-0 text-muted-foreground" />
+					</div>
+				</CardHeader>
+				<CardContent className="p-4">
+					{isLoading ? (
+						<p className="text-sm text-muted-foreground">
+							Carregando resumo...
+						</p>
+					) : (
+						<div className="flex flex-col gap-1.5 text-sm">
+							<div className="flex items-center justify-between">
+								<span className="text-muted-foreground">Produtos</span>
+								<span className="tabular-nums font-medium text-foreground">
+									{products.length}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-muted-foreground">Estoque baixo</span>
+								<span
+									className={`tabular-nums font-medium ${
+										lowStock > 0
+											? "text-amber-600 dark:text-amber-400"
+											: "text-foreground"
+									}`}
+								>
+									{lowStock}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-muted-foreground">Sem estoque</span>
+								<span
+									className={`tabular-nums font-medium ${
+										outOfStock > 0 ? "text-destructive" : "text-foreground"
+									}`}
+								>
+									{outOfStock}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-muted-foreground">Entradas</span>
+								<span className="tabular-nums font-medium text-foreground">
+									{currency.format(totalEntradas)}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-muted-foreground">Saídas</span>
+								<span className="tabular-nums font-medium text-foreground">
+									{currency.format(totalSaidas)}
+								</span>
+							</div>
+						</div>
+					)}
+				</CardContent>
+			</Card>
+		</button>
+	);
+}
+
 export function DashboardPage() {
 	const { user } = useAuthState();
 	const { defaultTeamId, setDefault } = useDefaultTeam();
 
 	const { data: teams = [] } = useTeams();
 
-	const selectedTeamId = defaultTeamId;
+	const [selection, setSelection] = useState<string>(ALL_TEAMS);
+	const isAllView = selection === ALL_TEAMS;
+	const selectedTeamId = isAllView ? null : selection;
 	const activeTeamName = teams.find((t) => t.id === selectedTeamId)?.name;
+
+	function handleSelectionChange(value: string) {
+		if (!value) return;
+		setSelection(value);
+		if (value !== ALL_TEAMS && value !== defaultTeamId) {
+			setDefault(value);
+		}
+	}
 
 	const { data: productsResult } = useProducts(selectedTeamId, { limit: 1000 });
 	const { data: movimentsResult } = useStockMoviments(selectedTeamId, {
 		limit: 1000,
 	});
-	const products = productsResult?.data ?? [];
-	const moviments = movimentsResult?.data ?? [];
+	const { summaries, isLoading: summariesLoading } = useTeamsSummaries(
+		isAllView ? teams : [],
+	);
+
+	const products = isAllView
+		? summaries.flatMap((s) => s.products)
+		: (productsResult?.data ?? []);
+	const moviments = isAllView
+		? summaries.flatMap((s) =>
+				s.moviments.map((m) => ({ ...m, teamName: s.team.name })),
+			)
+		: (movimentsResult?.data ?? []).map((m) => ({
+				...m,
+				teamName: undefined as string | undefined,
+			}));
 
 	const lowStock = products.filter(
 		(p) => p.quantity > 0 && p.quantity <= p.minumum,
@@ -149,16 +269,10 @@ export function DashboardPage() {
 						Olá, {firstName}
 					</h1>
 					<p className="text-sm text-muted-foreground mt-0.5">
-						Aqui está um resumo do seu estoque
-						{activeTeamName && (
-							<>
-								{" "}
-								—{" "}
-								<span className="font-medium text-foreground">
-									{activeTeamName}
-								</span>
-							</>
-						)}
+						Aqui está um resumo do seu estoque —{" "}
+						<span className="font-medium text-foreground">
+							{isAllView ? "Todas as equipes" : (activeTeamName ?? "Equipe")}
+						</span>
 					</p>
 				</div>
 
@@ -166,16 +280,12 @@ export function DashboardPage() {
 					<span className="text-sm font-medium text-foreground shrink-0">
 						Equipe:
 					</span>
-					<Select
-						value={defaultTeamId ?? ""}
-						onValueChange={(v) => {
-							if (v) setDefault(v);
-						}}
-					>
+					<Select value={selection} onValueChange={handleSelectionChange}>
 						<SelectTrigger className="w-full sm:w-52">
 							<SelectValue placeholder="Selecione uma equipe" />
 						</SelectTrigger>
 						<SelectContent>
+							<SelectItem value={ALL_TEAMS}>Todas as equipes</SelectItem>
 							{teams.map((team) => (
 								<SelectItem key={team.id} value={team.id}>
 									{team.name}
@@ -235,6 +345,41 @@ export function DashboardPage() {
 				</div>
 			</div>
 
+			{isAllView && (
+				<div className="flex flex-col gap-2">
+					<h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+						Resumo por equipe
+					</h2>
+					{teams.length === 0 ? (
+						<Card>
+							<CardContent className="flex flex-col items-center gap-2 p-6 text-center">
+								<UsersIcon className="size-8 text-muted-foreground" />
+								<p className="text-sm text-muted-foreground">
+									Você ainda não participa de nenhuma equipe.
+								</p>
+								<Button asChild variant="outline" size="sm">
+									<Link to="/equipes">Gerenciar equipes</Link>
+								</Button>
+							</CardContent>
+						</Card>
+					) : summariesLoading ? (
+						<p className="py-4 text-center text-sm text-muted-foreground">
+							Carregando resumos das equipes...
+						</p>
+					) : (
+						<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
+							{summaries.map((summary) => (
+								<TeamSummaryCard
+									key={summary.team.id}
+									summary={summary}
+									onSelect={() => handleSelectionChange(summary.team.id)}
+								/>
+							))}
+						</div>
+					)}
+				</div>
+			)}
+
 			{recentMoviments.length > 0 && (
 				<Card>
 					<CardHeader className="border-b">
@@ -249,6 +394,11 @@ export function DashboardPage() {
 										<span className="text-xs text-muted-foreground">
 											{dateFormat.format(new Date(moviment.date))}
 										</span>
+										{moviment.teamName && (
+											<span className="truncate text-xs text-muted-foreground">
+												· {moviment.teamName}
+											</span>
+										)}
 									</div>
 									<span className="truncate font-medium text-foreground">
 										{moviment.product?.name ?? moviment.productId}
@@ -269,6 +419,7 @@ export function DashboardPage() {
 									<TableRow>
 										<TableHead>Data</TableHead>
 										<TableHead>Tipo</TableHead>
+										{isAllView && <TableHead>Equipe</TableHead>}
 										<TableHead>Produto</TableHead>
 										<TableHead className="text-right">Qtd.</TableHead>
 										<TableHead className="text-right">Total</TableHead>
@@ -283,6 +434,11 @@ export function DashboardPage() {
 											<TableCell>
 												<TypeBadge type={moviment.type} />
 											</TableCell>
+											{isAllView && (
+												<TableCell className="text-muted-foreground">
+													{moviment.teamName}
+												</TableCell>
+											)}
 											<TableCell className="font-medium">
 												{moviment.product?.name ?? moviment.productId}
 											</TableCell>

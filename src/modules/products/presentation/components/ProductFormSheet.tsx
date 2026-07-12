@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ interface ProductFormSheetProps {
 	product?: Product;
 	onSubmit: (dto: CreateProductDto) => void;
 	isPending: boolean;
+	errorMessage?: string;
 }
 
 const emptyForm: CreateProductDto = {
@@ -41,10 +42,13 @@ export function ProductFormSheet({
 	product,
 	onSubmit,
 	isPending,
+	errorMessage,
 }: ProductFormSheetProps) {
+	const fieldId = useId();
 	const [form, setForm] = useState<CreateProductDto>(emptyForm);
 
 	useEffect(() => {
+		if (!open) return;
 		if (product) {
 			setForm({
 				name: product.name,
@@ -86,9 +90,9 @@ export function ProductFormSheet({
 
 				<form onSubmit={handleSubmit} className="flex flex-col gap-4 px-4 py-2">
 					<div className="flex flex-col gap-1.5">
-						<Label htmlFor="name">Nome</Label>
+						<Label htmlFor={`${fieldId}-name`}>Nome</Label>
 						<Input
-							id="name"
+							id={`${fieldId}-name`}
 							value={form.name}
 							onChange={(e) => handleChange("name", e.target.value)}
 							placeholder="Nome do produto"
@@ -97,9 +101,9 @@ export function ProductFormSheet({
 					</div>
 
 					<div className="flex flex-col gap-1.5">
-						<Label htmlFor="description">Descrição</Label>
+						<Label htmlFor={`${fieldId}-description`}>Descrição</Label>
 						<Textarea
-							id="description"
+							id={`${fieldId}-description`}
 							value={form.description}
 							onChange={(e) => handleChange("description", e.target.value)}
 							placeholder="Descrição do produto"
@@ -108,9 +112,9 @@ export function ProductFormSheet({
 					</div>
 
 					<div className="flex flex-col gap-1.5">
-						<Label htmlFor="local">Local</Label>
+						<Label htmlFor={`${fieldId}-local`}>Local</Label>
 						<Input
-							id="local"
+							id={`${fieldId}-local`}
 							value={form.local}
 							onChange={(e) => handleChange("local", e.target.value)}
 							placeholder="Ex: Depósito A - Prateleira 3"
@@ -119,9 +123,9 @@ export function ProductFormSheet({
 
 					<div className="grid grid-cols-2 gap-3">
 						<div className="flex flex-col gap-1.5">
-							<Label htmlFor="category">Categoria</Label>
+							<Label htmlFor={`${fieldId}-category`}>Categoria</Label>
 							<Input
-								id="category"
+								id={`${fieldId}-category`}
 								value={form.category}
 								onChange={(e) => handleChange("category", e.target.value)}
 								placeholder="Ex: Móveis"
@@ -129,9 +133,9 @@ export function ProductFormSheet({
 						</div>
 
 						<div className="flex flex-col gap-1.5">
-							<Label htmlFor="subcategory">Subcategoria</Label>
+							<Label htmlFor={`${fieldId}-subcategory`}>Subcategoria</Label>
 							<Input
-								id="subcategory"
+								id={`${fieldId}-subcategory`}
 								value={form.subcategory}
 								onChange={(e) => handleChange("subcategory", e.target.value)}
 								placeholder="Ex: Cadeiras"
@@ -140,9 +144,9 @@ export function ProductFormSheet({
 					</div>
 
 					<div className="flex flex-col gap-1.5">
-						<Label htmlFor="unity">Unidade</Label>
+						<Label htmlFor={`${fieldId}-unity`}>Unidade</Label>
 						<Input
-							id="unity"
+							id={`${fieldId}-unity`}
 							value={form.unity}
 							onChange={(e) => handleChange("unity", e.target.value)}
 							placeholder="Ex: unidade, caixa, kg"
@@ -151,22 +155,22 @@ export function ProductFormSheet({
 
 					<div className="flex items-center gap-2">
 						<Checkbox
-							id="isPortioned"
+							id={`${fieldId}-isPortioned`}
 							checked={form.isPortioned}
 							onCheckedChange={(checked) =>
 								handleChange("isPortioned", checked === true)
 							}
 						/>
-						<Label htmlFor="isPortioned" className="font-normal">
+						<Label htmlFor={`${fieldId}-isPortioned`} className="font-normal">
 							Produto porcionado
 						</Label>
 					</div>
 
 					<div className="grid grid-cols-2 gap-3">
 						<div className="flex flex-col gap-1.5">
-							<Label htmlFor="quantity">Quantidade</Label>
+							<Label htmlFor={`${fieldId}-quantity`}>Quantidade</Label>
 							<Input
-								id="quantity"
+								id={`${fieldId}-quantity`}
 								type="number"
 								min={0}
 								value={form.quantity}
@@ -177,9 +181,9 @@ export function ProductFormSheet({
 						</div>
 
 						<div className="flex flex-col gap-1.5">
-							<Label htmlFor="minumum">Quantidade Mínima</Label>
+							<Label htmlFor={`${fieldId}-minumum`}>Quantidade Mínima</Label>
 							<Input
-								id="minumum"
+								id={`${fieldId}-minumum`}
 								type="number"
 								min={0}
 								value={form.minumum}
@@ -191,9 +195,9 @@ export function ProductFormSheet({
 					</div>
 
 					<div className="flex flex-col gap-1.5">
-						<Label htmlFor="price">Preço (R$)</Label>
+						<Label htmlFor={`${fieldId}-price`}>Preço (R$)</Label>
 						<Input
-							id="price"
+							id={`${fieldId}-price`}
 							type="number"
 							min={0}
 							step={0.01}
@@ -201,6 +205,10 @@ export function ProductFormSheet({
 							onChange={(e) => handleChange("price", Number(e.target.value))}
 						/>
 					</div>
+
+					{errorMessage && (
+						<p className="text-xs text-destructive">{errorMessage}</p>
+					)}
 
 					<SheetFooter className="mt-2">
 						<Button
