@@ -32,11 +32,13 @@ function ScannedProductCard({
 }) {
 	const createStockMoviment = useCreateStockMoviment();
 	const [baseline, setBaseline] = useState(product.quantity);
-	const [quantityInput, setQuantityInput] = useState(String(product.quantity));
+	const [quantityInput, setQuantityInput] = useState("0");
+	const [direction, setDirection] = useState<StockMovimentType | null>(null);
 
 	useEffect(() => {
 		setBaseline(product.quantity);
-		setQuantityInput(String(product.quantity));
+		setQuantityInput("0");
+		setDirection(null);
 	}, [product.quantity]);
 
 	function handleMove(type: StockMovimentType, quantity: number) {
@@ -53,27 +55,30 @@ function ScannedProductCard({
 				teamId,
 			},
 			{
-				onSuccess: () => setBaseline(target),
-				onError: () => setQuantityInput(String(baseline)),
+				onSuccess: () => {
+					setBaseline(target);
+					setQuantityInput("0");
+					setDirection(null);
+				},
+				onError: () => {
+					setQuantityInput("0");
+					setDirection(null);
+				},
 			},
 		);
 	}
 
 	function handleQuantityBlur() {
 		if (Number.isNaN(Number.parseInt(quantityInput, 10))) {
-			setQuantityInput(String(baseline));
+			setQuantityInput("0");
 		}
 	}
 
 	const isMoving = createStockMoviment.isPending;
 	const parsedInput = Number.parseInt(quantityInput, 10);
-	const currentValue = Number.isNaN(parsedInput) ? baseline : parsedInput;
-	const pendingDiff = currentValue - baseline;
-	const hasPending = pendingDiff !== 0;
-
-	function adjustQuantity(delta: number) {
-		setQuantityInput(String(Math.max(0, currentValue + delta)));
-	}
+	const amount = Number.isNaN(parsedInput) ? 0 : parsedInput;
+	const exceedsStock = direction === "saída" && amount > baseline;
+	const hasPending = direction !== null && amount > 0;
 
 	return (
 		<Card>
@@ -97,22 +102,13 @@ function ScannedProductCard({
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-center gap-2">
 						<Button
-							variant="outline"
-							size="icon"
-							className="size-11 text-sm font-semibold"
-							onClick={() => adjustQuantity(-5)}
-							disabled={isMoving || !teamId || currentValue === 0}
-							aria-label="Diminuir 5 unidades"
-						>
-							-5
-						</Button>
-						<Button
-							variant="outline"
+							variant={direction === "saída" ? "default" : "outline"}
 							size="icon"
 							className="size-11"
-							onClick={() => adjustQuantity(-1)}
-							disabled={isMoving || !teamId || currentValue === 0}
-							aria-label="Diminuir 1 unidade"
+							onClick={() => setDirection("saída")}
+							disabled={isMoving || !teamId}
+							aria-label="Retirar do estoque"
+							aria-pressed={direction === "saída"}
 						>
 							<MinusIcon />
 						</Button>
@@ -129,52 +125,46 @@ function ScannedProductCard({
 							disabled={isMoving || !teamId}
 							inputMode="numeric"
 							autoComplete="off"
-							aria-label="Quantidade em estoque"
+							aria-label="Quantidade a movimentar"
 							className="h-11 w-20 text-center text-xl font-semibold tabular-nums"
 						/>
 						<Button
-							variant="outline"
+							variant={direction === "entrada" ? "default" : "outline"}
 							size="icon"
 							className="size-11"
-							onClick={() => adjustQuantity(1)}
+							onClick={() => setDirection("entrada")}
 							disabled={isMoving || !teamId}
-							aria-label="Aumentar 1 unidade"
+							aria-label="Adicionar ao estoque"
+							aria-pressed={direction === "entrada"}
 						>
 							<PlusIcon />
-						</Button>
-						<Button
-							variant="outline"
-							size="icon"
-							className="size-11 text-sm font-semibold"
-							onClick={() => adjustQuantity(5)}
-							disabled={isMoving || !teamId}
-							aria-label="Aumentar 5 unidades"
-						>
-							+5
 						</Button>
 					</div>
 
 					{hasPending ? (
 						<div className="flex flex-col gap-1">
 							<Button
-								onClick={() =>
-									handleMove(
-										pendingDiff > 0 ? "entrada" : "saída",
-										Math.abs(pendingDiff),
-									)
-								}
-								disabled={isMoving || !teamId}
+								onClick={() => direction && handleMove(direction, amount)}
+								disabled={isMoving || !teamId || exceedsStock}
 								className="w-full gap-2"
 							>
 								<CheckIcon className="size-4" />
-								{pendingDiff > 0 ? "Adicionar" : "Retirar"}{" "}
-								{Math.abs(pendingDiff)} {product.unity}{" "}
-								{pendingDiff > 0 ? "ao" : "do"} estoque
+								{direction === "entrada" ? "Adicionar" : "Retirar"} {amount}{" "}
+								{product.unity} {direction === "entrada" ? "ao" : "do"} estoque
 							</Button>
+							{exceedsStock && (
+								<p className="text-center text-xs text-destructive">
+									Quantidade maior que o estoque atual ({baseline}{" "}
+									{product.unity}).
+								</p>
+							)}
 							<Button
 								variant="ghost"
 								size="sm"
-								onClick={() => setQuantityInput(String(baseline))}
+								onClick={() => {
+									setQuantityInput("0");
+									setDirection(null);
+								}}
 								disabled={isMoving}
 								className="w-full"
 							>
@@ -183,8 +173,8 @@ function ScannedProductCard({
 						</div>
 					) : (
 						<p className="text-center text-xs text-muted-foreground">
-							Ajuste a quantidade com os botões ou digite o valor final. Nada é
-							registrado até você confirmar.
+							Digite a quantidade e toque em − para retirar ou + para adicionar.
+							Nada é registrado até você confirmar.
 						</p>
 					)}
 				</div>
