@@ -14,10 +14,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import type { CreateProductDto } from "@/modules/products/application/dtos/ProductDto";
 import type { Product } from "@/modules/products/domain/entities/Product";
 import { AssociateBarcodeSheet } from "@/modules/products/presentation/components/AssociateBarcodeSheet";
 import { BarcodeScannerCamera } from "@/modules/products/presentation/components/BarcodeScannerCamera";
+import { ProductFormSheet } from "@/modules/products/presentation/components/ProductFormSheet";
 import { StockBadge } from "@/modules/products/presentation/components/StockBadge";
+import { useCreateProduct } from "@/modules/products/presentation/hooks/useCreateProduct";
 import { useProductByBarcode } from "@/modules/products/presentation/hooks/useProductByBarcode";
 import type { StockMovimentType } from "@/modules/stockMoviment/domain/entities/StockMoviment";
 import { useCreateStockMoviment } from "@/modules/stockMoviment/presentation/hooks/useCreateStockMoviment";
@@ -194,6 +197,8 @@ export function BarcodeScannerPage() {
 	const [barcode, setBarcode] = useState<string | null>(null);
 	const [manualCode, setManualCode] = useState("");
 	const [associateOpen, setAssociateOpen] = useState(false);
+	const [createOpen, setCreateOpen] = useState(false);
+	const createProduct = useCreateProduct();
 
 	const {
 		data: product,
@@ -216,6 +221,19 @@ export function BarcodeScannerPage() {
 	function handleDetected(code: string) {
 		setManualCode(code);
 		setBarcode(code);
+	}
+
+	async function handleCreate(dto: CreateProductDto) {
+		if (!defaultTeamId || !barcode) return;
+		try {
+			await createProduct.mutateAsync({
+				teamId: defaultTeamId,
+				dto: { ...dto, barcode },
+			});
+			setCreateOpen(false);
+		} catch {
+			// createProduct.isError exibe a mensagem de erro no formulário
+		}
 	}
 
 	return (
@@ -313,9 +331,23 @@ export function BarcodeScannerPage() {
 								equipe.
 							</p>
 						</div>
-						<Button onClick={() => setAssociateOpen(true)}>
-							Associar a um produto
-						</Button>
+						<div className="flex w-full flex-col gap-2">
+							<Button
+								onClick={() => setCreateOpen(true)}
+								className="w-full gap-2"
+							>
+								<PlusIcon className="size-4" />
+								Cadastrar novo produto
+							</Button>
+							<Button
+								variant="outline"
+								onClick={() => setAssociateOpen(true)}
+								className="w-full gap-2"
+							>
+								<Link2Icon className="size-4" />
+								Associar a um produto existente
+							</Button>
+						</div>
 					</CardContent>
 				</Card>
 			)}
@@ -338,6 +370,18 @@ export function BarcodeScannerPage() {
 					currentProductId={product?.id}
 				/>
 			)}
+
+			<ProductFormSheet
+				open={createOpen}
+				onOpenChange={setCreateOpen}
+				onSubmit={handleCreate}
+				isPending={createProduct.isPending}
+				errorMessage={
+					createProduct.isError
+						? "Erro ao cadastrar o produto. Tente novamente."
+						: undefined
+				}
+			/>
 		</div>
 	);
 }
